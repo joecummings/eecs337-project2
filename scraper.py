@@ -1,0 +1,1 @@
+#This file will contain all of the functions necessary to parse the beautifulsoup response text
