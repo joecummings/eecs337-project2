@@ -4,18 +4,24 @@ import requests
 from bs4 import BeautifulSoup
 import scraper as s
 import re
+import pdb
 query = ""
+request = ""
 
 
 def main():
     if len(sys.argv) != 2:
-        print("Please provide a recipe url to scrape.")
+        print("Please provide a recipe url to scrape and any modifications you want to make")
     else:
         query = sys.argv[1]
         print("Recipe Link: {0}".format(query))
         page = requests.get(query).text
         soup = BeautifulSoup(page, 'html.parser')
         scrape_recipe(soup)
+        #pdb.set_trace()
+        request = input("Okay, how do you want to alter this recipe?")
+        #request = sys.argv[2]
+        transformation_query(request)
 
 
 def scrape_recipe(soup):
@@ -53,7 +59,7 @@ def scrape_recipe(soup):
 
     print("Calorie Count: {0}".format(calcount))
 
-    try: 
+    try:
         ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
         for i in ingredients:
             ingredients[ingredients.index(i)] = cleanhtml(str(i))
@@ -63,7 +69,7 @@ def scrape_recipe(soup):
     print("INGREDIENTS:")
 
     for i in ingredients:
-        print(i) 
+        print(i)
 
     try:
         directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
@@ -77,6 +83,24 @@ def scrape_recipe(soup):
     for d in directions:
         if d.strip() != "":
             print("{0}) {1}".format(directions.index(d)+1,d))
+
+def transformation_query(word):
+    #Determine Type of transformation requested
+    #print("Okay, how do you want to alter this recipe?")
+    #request = input("Okay, how do you want to alter this recipe?")
+    #parse each response to see if it contains a key word related to each potential
+    #task also check to see if capitalization matters
+    request = str(word)
+    if "vegetarian" in request:
+        print("got a veggie request") #replace with call to vegetarian modifier function
+    elif "healthy" in request:
+        print("got a healthy request") #replace with call to healthier modifier function
+    elif "family" in request:
+        print("got a family request") #replace with call to family style modifier function (double everything)
+    elif "spicy" in request:
+        print("got a spicy request") #replace with call to spicy modifier function (double everything)
+    else:
+        print("Sorry, but the cookbook doesn't have any suggestions for that!")
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
