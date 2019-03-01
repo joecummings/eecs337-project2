@@ -2,12 +2,14 @@
 import sys
 import requests
 from bs4 import BeautifulSoup
-import scraper as s
 import re
-query = ""
+import json
 
+query = ""
+ingredients = set([])
 
 def main():
+    load_ingredients()
     if len(sys.argv) != 2:
         print("Please provide a recipe url to scrape.")
     else:
@@ -17,6 +19,14 @@ def main():
         soup = BeautifulSoup(page, 'html.parser')
         scrape_recipe(soup)
 
+def load_ingredients():
+    with open("ingredients.json") as file:
+        data = json.load(file)
+        for i in data:
+           for ingredient in i['ingredients']:
+               ingredients.add(ingredient)
+        #    ingredients.add()
+    print("Ingredients Loaded: {0}".format(len(ingredients)))
 
 def scrape_recipe(soup):
         # This is called when user wants to scrape for specific recipe site
