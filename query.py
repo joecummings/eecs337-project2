@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import json
-
+import recipe as r
 query = ""
 ingredients = set([])
 
@@ -31,33 +31,35 @@ def load_ingredients():
 def scrape_recipe(soup):
         # This is called when user wants to scrape for specific recipe site
         # Try functions were used to prevent any one element from stopping the operation
-
     try:
         rtitle = soup.find_all('h1')
         rtitle = cleanhtml(str(rtitle[0]))
     except:
         rtitle = 'NA'
-
-    print("Recipe Title: {0}".format(rtitle))
+    recipe = r.Recipe(rtitle)
+    # print("Recipe Title: {0}".format(rtitle))
 
     try:
         starrating = soup.find_all('div',{'class':'rating-stars'})
         starrating = starrating[0]['data-ratingstars']
+        recipe.set_rating(starrating)
     except:
         starrating = 'NA'
-    print("Rating: {0} out of 5".format(starrating))
+    # print("Rating: {0} out of 5".format(starrating))
 
     try:
         reviewcount = soup.find_all("meta",{'itemprop':'reviewCount'})
         reviewcount = reviewcount[0]['content']
+        recipe.set_number_of_reviews(reviewcount)
     except:
         reviewcount = 'NA'
 
-    print("Number of Reviews: {0}".format(reviewcount))
+    # print("Number of Reviews: {0}".format(reviewcount))
 
     try:
         calcount = soup.find_all("span",{"class":'calorie-count'})
         calcount = calcount[0]['aria-label']
+        recipe.set_calories(calcount)
     except:
         calcount = 'NA'
 
@@ -66,7 +68,10 @@ def scrape_recipe(soup):
     try: 
         ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
         for i in ingredients:
+            ingredient = r.build_ingredient(cleanhtml(str(i)))
+            recipe.add_ingredient(ingredient)
             ingredients[ingredients.index(i)] = cleanhtml(str(i))
+
     except:
         ingredients = "NA"
 
@@ -77,14 +82,22 @@ def scrape_recipe(soup):
 
     try:
         directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
+        print(directions)
         for i in directions:
-            directions[directions.index(i)] = cleanhtml(str(i))
+            print(i.strip())
+
+            step = cleanhtml(str(i))
+            recipe.add_step(step)
+            # if step.strip() != "":
+            #     directions[directions.index(i)] = step
+            # recipe.add_step(cleanhtml(str(i)))
+            # directions[directions.index(i)] = 
     except:
         directions = "NA"
 
     print("DIRECTIONS")
 
-    for d in directions:
+    for d in recipe.get_steps():
         if d.strip() != "":
             print("{0}) {1}".format(directions.index(d)+1,d))
 
