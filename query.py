@@ -6,27 +6,29 @@ import re
 import json
 import recipe as r
 query = ""
-ingredients = set([])
 
+
+
+#FOR SAMPLE OUTPUT ---- Run: python query.py -nyc 500
 def main():
-    load_ingredients()
+    r.load_ingredients()
+    r.load_corpus()
     if len(sys.argv) != 2:
-        print("Please provide a recipe url to scrape.")
+        if "-nyc" in sys.argv:
+            recipes = int(sys.argv[sys.argv.index("-nyc")+1])
+            print("Supplementing ingredient list with {0} New York Times Cooking Recipes".format(recipes))
+            r.ingredients = r.ingredients.union(r.pull_nyt(recipes))
+        print("URL not correctly provided. Proceeding with test url's")
+        pullrecipes()
     else:
         query = sys.argv[1]
         print("Recipe Link: {0}".format(query))
-        page = requests.get(query).text
-        soup = BeautifulSoup(page, 'html.parser')
-        scrape_recipe(soup)
-
-def load_ingredients():
-    with open("ingredients.json") as file:
-        data = json.load(file)
-        for i in data:
-           for ingredient in i['ingredients']:
-               ingredients.add(ingredient)
-        #    ingredients.add()
-    print("Ingredients Loaded: {0}".format(len(ingredients)))
+        get_url(query)
+        
+def get_url(url):
+    page = requests.get(url).text
+    soup = BeautifulSoup(page, 'html.parser')
+    scrape_recipe(soup)
 
 def scrape_recipe(soup):
         # This is called when user wants to scrape for specific recipe site
@@ -65,46 +67,51 @@ def scrape_recipe(soup):
 
     print("Calorie Count: {0}".format(calcount))
 
-    try: 
-        ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
-        for i in ingredients:
-            ingredient = r.build_ingredient(cleanhtml(str(i)))
-            recipe.add_ingredient(ingredient)
-            ingredients[ingredients.index(i)] = cleanhtml(str(i))
+    # try: 
+    print("\nINGREDIENTS:")
 
-    except:
-        ingredients = "NA"
-
-    print("INGREDIENTS:")
-
+    ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
     for i in ingredients:
-        print(i) 
+        ingredient = r.build_ingredient(cleanhtml(str(i)))
+        recipe.add_ingredient(ingredient)
+        ingredients[ingredients.index(i)] = cleanhtml(str(i))
+    # except:
+        # ingredients = "NA"
 
+
+    # for i in ingredients:
+    #     print(i) 
+    print()
     try:
-        directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
-        print(directions)
-        for i in directions:
-            print(i.strip())
+        print("DIRECTIONS")
 
+        directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
+        # print(directions)
+        for i in directions:
             step = cleanhtml(str(i))
-            recipe.add_step(step)
-            # if step.strip() != "":
-            #     directions[directions.index(i)] = step
-            # recipe.add_step(cleanhtml(str(i)))
-            # directions[directions.index(i)] = 
+            if step.strip() != "":
+                recipe.add_step(step)
     except:
         directions = "NA"
 
-    print("DIRECTIONS")
 
     for d in recipe.get_steps():
-        if d.strip() != "":
-            print("{0}) {1}".format(directions.index(d)+1,d))
+        print("{0}".format(d))
+    print()
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
   return cleantext.strip()
+
+
+
+def pullrecipes():
+    print("Grabbing 10 Recipes")
+    for i in range(8000,8010):
+        url = "https://www.allrecipes.com/recipe/{0}/oooh-baby-chocolate-prune-cake/".format(i)
+        get_url(url)
+    
 
 if __name__ == "__main__":
     main()
