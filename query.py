@@ -5,23 +5,21 @@ from bs4 import BeautifulSoup
 import re
 import json
 import recipe as r
+import wiki
 query = ""
 
 
 
-#FOR SAMPLE OUTPUT ---- Run: python query.py -nyc 500
+#FOR SAMPLE OUTPUT ---- Run: python query.py
 def main():
     r.load_ingredients()
+    r.build_tokenizer()
     r.load_corpus()
-    if len(sys.argv) != 2:
-        if "-nyc" in sys.argv:
-            recipes = int(sys.argv[sys.argv.index("-nyc")+1])
-            print("Supplementing ingredient list with {0} New York Times Cooking Recipes".format(recipes))
-            r.ingredients = r.ingredients.union(r.pull_nyt(recipes))
-        print("URL not correctly provided. Proceeding with test url's")
+
+    if "-url" not in sys.argv:
         pullrecipes()
     else:
-        query = sys.argv[1]
+        query = sys.argv[sys.argv.index("-url")+1]
         print("Recipe Link: {0}".format(query))
         get_url(query)
         
@@ -68,13 +66,15 @@ def scrape_recipe(soup):
     print("Calorie Count: {0}".format(calcount))
 
     # try: 
-    print("\nINGREDIENTS:")
-
+    print("\nINGREDIENTS\n")
+    
     ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
+    count = 1
     for i in ingredients:
-        ingredient = r.build_ingredient(cleanhtml(str(i)))
+        ingredient = r.build_ingredient(cleanhtml(str(i)),count)
         recipe.add_ingredient(ingredient)
         ingredients[ingredients.index(i)] = cleanhtml(str(i))
+        count+=1
     # except:
         # ingredients = "NA"
 

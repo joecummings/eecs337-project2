@@ -3,28 +3,60 @@ import json
 import re
 import string
 import scraper as s
+import wiki
 ingredients = set([])
 tokenizer = MWETokenizer()
 measurements = set([])
 techniques = set([])
+meats = set([])
+veggies = set([])
+food = set([])
 
+def pull_meat():
+    meats = wiki.pull_wikidata_meat()
+    return meats
+def pull_veggies():
+    veggies = wiki.pull_all_vegetables()
+    return veggies
 
+# def pull_nyt(recipes):
+#     res = s.pull_ingredients(recipes)
+#     return res
 
-def pull_nyt(recipes):
-    res = s.pull_ingredients(recipes)
+def pull_wiki():
+    res = wiki.pull_wikidata_food()
     return res
+
+def build_tokenizer():
+    print("\nBuilding Multi Word Tokenizer...")
+    for i in food:
+        s = i.split("_")
+        tokenizer.add_mwe(s)
     
 def load_ingredients():
+    print("Loading meats...")
+    #Load Meats into Food set
+    meats = pull_meat()
+    for i in meats:
+        food.add(i.replace(" ", "_"))
+    #Load Veggies into Food set
+    print("Loading veggies...")
+    veggies = pull_veggies()
+    for veggie in veggies:
+        food.add(i.replace(" ", "_"))
+
+    print("Loading all other Foods...")
+    #Load Foods from Ingredients.json File
     with open("ingredients.json") as file:
         data = json.load(file)
-        print("\nBuilding Multi Word Tokenizer...")
         for i in data:
             for ingredient in i['ingredients']:
-                s = ingredient.split()
-                res = "_".join(s)
-                ingredients.add(res)
-                tokenizer.add_mwe(s)
-    print("Ingredients Loaded: {0}\n".format(len(ingredients)))
+                food.add(ingredient.replace(" ", "_"))                
+    #Load Foods from Wikidata
+    wiki_ingredients = pull_wiki()
+    for i in wiki_ingredients['ingredients']:
+        food.add(i.replace(" ", "_"))
+    print("Ingredients Loaded: {0}\n".format(len(food)))
 
 def load_corpus():
     with open("corpus.json") as file:
@@ -97,22 +129,28 @@ class Ingredient:
         self.preparation = preparation
 
 
-def build_ingredient(s):
+def build_ingredient(s,index):
+    veggie = ""
+    meat = ""
     match = re.search(r'\((.*?)\)', s)
     if match is not None:
         alternate_measurement = match.groups()[0]
         s = s.replace("(" + alternate_measurement + ")", "")
     else:
         alternate_measurement = "N/A"
-    if ", " in s:
-        prep = s.split(", ")
-        preparation = prep[1]
-        phrase = prep[0]
-    else:
-        phrase = s
-        preparation = "N/A"
+    # if ", " in s:
+    #     prep = s.split(", ")
+    #     preparation = prep[1]
+    #     phrase = prep[0]
+    # else:
+    #     phrase = s
+    #     preparation = ""
+    phrase = s.replace(",", "").lower()
     words = tokenizer.tokenize(phrase.split())
+    preparation = ""
     name = tag_ingredient_name(words)
+    if name in meats:
+        meat = "MEAT"
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)
     sent = sent.replace(quantity, "")
@@ -122,12 +160,14 @@ def build_ingredient(s):
     sent = " ".join(words)
     sent = sent.replace(measurement, "")
     
-    print("Ingredient: {0} -- Quantity: {1} -- Measurement-- {2} -- Preparation: {3} -- Descriptors: {4}".format(
-        name, quantity, measurement, preparation, sent))
+    print("\t"+ str(index) + ") " + "{1} {2} {0} {3}".format(name.replace("_"," "), quantity, measurement,meat).strip().replace("  ", " "))
+
+    # print("Ingredient: {0} -- Quantity: {1} -- Measurement-- {2} -- Preparation: {3} -- Descriptors: {4}".format(
+    #     name, quantity, measurement, preparation, sent))
     return s
 
 def tag_ingredient_measurement(words):
-    measure = "N/A"
+    measure = ""
     for word in words:
         if word in measurements:
             measure = word
@@ -135,9 +175,9 @@ def tag_ingredient_measurement(words):
     
 
 def tag_ingredient_name(words):
-    name = "N/A"
+    name = ""
     for word in words:
-        if word in ingredients:
+        if word in food:
             name = word
     return name
 
@@ -149,7 +189,7 @@ def tag_ingredient_quantity(words, ingredient):
         if word.isdigit() or match is not None:
             qty.append(word)
     if len(qty) == 0:
-        qty = "N/A"
+        qty = ""
     else:
         qty = " ".join(qty)
     return qty
