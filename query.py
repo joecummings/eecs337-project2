@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import scraper as s
 import re
 import pdb
+#import transformers
 query = ""
 request = ""
 
@@ -97,8 +98,8 @@ def transformation_query(word):
         print("got a healthy request") #replace with call to healthier modifier function
     elif "family" in request:
         print("got a family request") #replace with call to family style modifier function (double everything)
-    elif "spicy" in request:
-        print("got a spicy request") #replace with call to spicy modifier function (double everything)
+    elif "mexican" in request:
+        print("got a mexican request") #replace with call to spicy modifier function (double everything)
     else:
         print("Sorry, but the cookbook doesn't have any suggestions for that!")
 

@@ -1,0 +1,38 @@
+fact: (isa beef meat)
+fact: (isa chicken meat)
+fact: (isa pork meat)
+fact: (isa turkey meat)
+fact: (isa bacon meat)
+
+fact: (isa steak beef)
+
+fact: (vsub black_beans beef)
+fact: (vsub seitan beef)
+fact: (vsub falafel beef)
+fact: (vsub tofu beef)
+fact: (vsub mushroom beef)
+
+fact: (vsub tofu chicken)
+fact: (vsub falafel chicken)
+fact: (vsub eggplant chicken)
+
+fact: (vsub jackfruit pork)
+fact: (vsub seitan pork)
+fact: (vsub lentils pork)
+
+fact: (vsub tofurkey turkey)
+fact: (vsub seitan turkey)
+
+fact: (vsub veggie_bacon bacon)
+
+fact: (mexadd chilli_powder)
+fact: (mexsub mashed_potato rice)
+
+
+fact: (hsub bread_crumbs oats)
+fact: (hsub bacon_bits smoked_paprika)
+fact: (hsub salt lemon_juice)
+fact: (hsub bread_crumbs oats)
+fact: (hsub butter margarine)
+
+
