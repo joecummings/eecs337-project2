@@ -1,26 +1,15 @@
-
+from recipe import recipe
 import sys
 import requests
 from bs4 import BeautifulSoup
 import scraper as s
 import re
-query = ""
-
-
-def main():
-    if len(sys.argv) != 2:
-        print("Please provide a recipe url to scrape.")
-    else:
-        query = sys.argv[1]
-        print("Recipe Link: {0}".format(query))
-        page = requests.get(query).text
-        soup = BeautifulSoup(page, 'html.parser')
-        scrape_recipe(soup)
-
 
 def scrape_recipe(soup):
         # This is called when user wants to scrape for specific recipe site
         # Try functions were used to prevent any one element from stopping the operation
+
+    retRecipe = recipe()
 
     try:
         rtitle = soup.find_all('h1')
@@ -29,6 +18,8 @@ def scrape_recipe(soup):
         rtitle = 'NA'
 
     print("Recipe Title: {0}".format(rtitle))
+    retRecipe.name = "{0}".format(rtitle)
+    print(retRecipe.name)
 
     try:
         starrating = soup.find_all('div',{'class':'rating-stars'})
@@ -64,6 +55,7 @@ def scrape_recipe(soup):
 
     for i in ingredients:
         print(i) 
+        retRecipe.ingredients.append(i)
 
     try:
         directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
@@ -77,11 +69,11 @@ def scrape_recipe(soup):
     for d in directions:
         if d.strip() != "":
             print("{0}) {1}".format(directions.index(d)+1,d))
+            retRecipe.directions.append("{0}) {1}".format(directions.index(d)+1,d))
+
+    return retRecipe
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
   return cleantext.strip()
-
-if __name__ == "__main__":
-    main()
