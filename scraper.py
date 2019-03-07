@@ -1,66 +1,36 @@
-# This file will contain all of the functions necessary to parse the beautifulsoup response text
-def clean():
-    print("DO STUFF")
+import requests
+from bs4 import BeautifulSoup
+import re
+import json
 
-def scrape_recipe(br, year, idnumber):
-    # This is called when user wants to scrape for specific recipe site
-    # Try functions were used to prevent any one element from stopping the operation
+start = 1020000
+end = 1021000
 
-    # recipe title
-    try:
-        rtitle = br.find_element_by_tag_name('h1').text
-    except:
-        rtitle = 'NA'
 
-    # Star rating
-    try:
-        starrating = br.find_element_by_class_name('rating-stars').\
-            get_attribute('data-ratingstars')
-    except:
-        starrating = 'NA'
+def pull_ingredients(recipes):
+    ingredients = set([])
+    for i in range(start, start+recipes):
+        res = get_url("https://cooking.nytimes.com/recipes/{0}".format(i))
+        ingredients = ingredients.union(res)
+    return ingredients
+# To scrape NYT subscription
 
-    # Number of people who clicked that they "made it"
-    try:
-        madeitcount = br.find_element_by_class_name('made-it-count').text
-    except:
-        madeitcount = 'NA'
 
-    # Number of reviews
-    try:
-        reviewcount = br.find_element_by_class_name('review-count').text
-        reviewcount = str(re.findall('(\w+) reviews', reviewcount)[0])
-    except:
-        reviewcount = 'NA'
+def get_url(url):
+    page = requests.get(url).text
+    soup = BeautifulSoup(page, 'html.parser')
+    ingredients = scrape_ingredients(soup)
+    return ingredients
 
-    # calories per serving
-    try:
-        calcount = br.find_element_by_class_name('calorie-count').text
-        calcount = str(re.findall('(\w+) cals', calcount)[0])
-    except:
-        calcount = 'NA'
+def scrape_ingredients(soup):
+        # This is called when user wants to scrape for specific recipe site
+        # Try functions were used to prevent any one element from stopping the operation
+    ingredients = soup.find_all("span", {"class": "ingredient-name"})
+    res = set([])
+    if ingredients != []:
+        for ingredient in ingredients:
+            match = re.findall(r'>(.*)<', str(ingredient))
+            if match != []:
+                res.add(match[0])
+    return res
 
-    # prep time
-    try:
-        prepTime = br.find_element_by_xpath('//time[@itemprop = "prepTime"]').\
-            get_attribute('datetime')
-        prepTime = str(re.findall('PT(\w+)', prepTime)[0])
-    except:
-        prepTime = 'NA'
-
-    # Cook time
-    try:
-        cookTime = br.find_element_by_xpath('//time[@itemprop = "cookTime"]').\
-            get_attribute('datetime')
-        cookTime = str(re.findall('PT(\w+)', cookTime)[0])
-    except:
-        cookTime = 'NA'
-
-    # total time
-    try:
-        totalTime = br.find_element_by_xpath('//time[@itemprop = "totalTime"]').\
-            get_attribute('datetime')
-        totalTime = str(re.findall('PT(\w+)', totalTime)[0])
-    except:
-        totalTime = 'NA'
-    # find all the ingredient attributes
-    ingred = br.find_elements_by_class_name("checkList__item")
