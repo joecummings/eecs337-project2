@@ -4,7 +4,10 @@ import requests
 from bs4 import BeautifulSoup
 import re
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 import json
 import recipe as r
 import wiki
@@ -29,15 +32,21 @@ def get_url(url):
     page = requests.get(url).text
     soup = BeautifulSoup(page, 'html.parser')
     scrape_recipe(soup)
+<<<<<<< HEAD
+>>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
+=======
 >>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 
 def scrape_recipe(soup):
         # This is called when user wants to scrape for specific recipe site
         # Try functions were used to prevent any one element from stopping the operation
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     retRecipe = recipe()
 
+=======
+>>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 =======
 >>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
     try:
@@ -46,10 +55,15 @@ def scrape_recipe(soup):
     except:
         rtitle = 'NA'
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     print("Recipe Title: {0}".format(rtitle))
     retRecipe.name = "{0}".format(rtitle)
     print(retRecipe.name)
+=======
+    recipe = r.Recipe(rtitle)
+    # print("Recipe Title: {0}".format(rtitle))
+>>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 =======
     recipe = r.Recipe(rtitle)
     # print("Recipe Title: {0}".format(rtitle))
@@ -88,9 +102,12 @@ def scrape_recipe(soup):
     count = 1
     for i in ingredients:
 <<<<<<< HEAD
+<<<<<<< HEAD
         print(i) 
         retRecipe.ingredients.append(i)
 =======
+=======
+>>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
         ingredient = r.build_ingredient(cleanhtml(str(i)),count)
         recipe.add_ingredient(ingredient)
         ingredients[ingredients.index(i)] = cleanhtml(str(i))
@@ -98,6 +115,9 @@ def scrape_recipe(soup):
     # except:
         # ingredients = "NA"
 
+<<<<<<< HEAD
+>>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
+=======
 >>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 
     # for i in ingredients:
@@ -117,12 +137,18 @@ def scrape_recipe(soup):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     for d in directions:
         if d.strip() != "":
             print("{0}) {1}".format(directions.index(d)+1,d))
             retRecipe.directions.append("{0}) {1}".format(directions.index(d)+1,d))
 
     return retRecipe
+=======
+    for d in recipe.get_steps():
+        print("{0}".format(d))
+    print()
+>>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 =======
     for d in recipe.get_steps():
         print("{0}".format(d))
