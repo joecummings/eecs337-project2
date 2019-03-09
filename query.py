@@ -19,9 +19,10 @@ def main():
 
     print("Recipe Link: {0}".format(query))
     recipe = get_url(query)
-    print(recipe.ingredients)
+    print_recipe(recipe)
+    
 
-    print("*** *** ***")
+    print("\n*** *** ***")
     next_action = ""
 
     while next_action != 'x':
@@ -31,9 +32,19 @@ def main():
         print("Healthy -> h")
         print("Exit -> x")
         next_action = input("Select your next action/transformation: ")
-        print("--- --- --- --- --- --- --- ---")
-        perform_transform(next_action,recipe)
-        
+        print("--- --- --- --- --- --- --- ---\n")
+        new_recipe = perform_transform(next_action,recipe)
+        print_recipe(new_recipe)
+
+def print_recipe(r):
+    print("Recipe Title: {0}".format(r.name))
+    print("Calorie Count: {0}".format(r.calories))
+    print("\nINGREDIENTS\n")
+    for i,gred in enumerate(r.ingredients):
+        print("\t"+ str(i+1) + ") " + str(gred))
+    print("DIRECTIONS")
+    for s in r.steps:
+        print(s)
 
 def perform_transform(n,recipe):
     if n == 'm':
@@ -60,7 +71,7 @@ def scrape_recipe(soup):
     except:
         rtitle = 'NA'
     recipe = r.Recipe(rtitle)
-    print("Recipe Title: {0}".format(rtitle))
+    # print("Recipe Title: {0}".format(rtitle))
 
     try:
         starrating = soup.find_all('div',{'class':'rating-stars'})
@@ -83,20 +94,22 @@ def scrape_recipe(soup):
     except:
         calcount = 'NA'
 
-    print("Calorie Count: {0}".format(calcount))
+    # print("Calorie Count: {0}".format(calcount))
 
-    print("\nINGREDIENTS\n")
+    # print("\nINGREDIENTS\n")
     
     ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
     count = 1
     for i in ingredients:
         ingredient = r.build_ingredient(cleanhtml(str(i)),count)
-        recipe.add_ingredient(ingredient)
+        # recipe.add_ingredient(ingredient)
         ingredients[ingredients.index(i)] = cleanhtml(str(i))
         count+=1
+    
+    recipe.ingredients = ingredients
 
     try:
-        print("DIRECTIONS")
+        # print("DIRECTIONS")
 
         directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
         # print(directions)
@@ -107,10 +120,8 @@ def scrape_recipe(soup):
     except:
         directions = "NA"
 
-    for d in recipe.get_steps():
-        print("{0}".format(d))
-    print(recipe.ingredients)
-    print('wtf')
+    # for d in recipe.get_steps():
+    #     print("{0}".format(d))
     return recipe
 
 def cleanhtml(raw_html):
