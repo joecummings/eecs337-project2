@@ -6,6 +6,8 @@ import json
 import recipe as r
 import wiki
 query = ""
+mexican = {}
+chinese = {}
 
 #FOR SAMPLE OUTPUT ---- Run: python query.py
 def main():
