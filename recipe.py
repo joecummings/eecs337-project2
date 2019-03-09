@@ -28,24 +28,24 @@ def pull_wiki():
     return res
 
 def build_tokenizer():
-    print("\nBuilding Multi Word Tokenizer...")
+    # print("\nBuilding Multi Word Tokenizer...")
     for i in food:
         s = i.split("_")
         tokenizer.add_mwe(s)
     
 def load_ingredients():
-    print("Loading meats...")
+    print("Loading...")
     #Load Meats into Food set
     meats = pull_meat()
     for i in meats:
         food.add(i.replace(" ", "_"))
     #Load Veggies into Food set
-    print("Loading veggies...")
+    # print("Loading veggies...")
     veggies = pull_veggies()
     for veggie in veggies:
         food.add(i.replace(" ", "_"))
 
-    print("Loading all other Foods...")
+    # print("Loading all other Foods...")
     #Load Foods from Ingredients.json File
     with open("ingredients.json") as file:
         data = json.load(file)
@@ -56,12 +56,12 @@ def load_ingredients():
     wiki_ingredients = pull_wiki()
     for i in wiki_ingredients['ingredients']:
         food.add(i.replace(" ", "_"))
-    print("Ingredients Loaded: {0}\n".format(len(food)))
+    # print("Ingredients Loaded: {0}\n".format(len(food)))
 
 def load_corpus():
     with open("corpus.json") as file:
         data = json.load(file)
-        print("\nBuilding Measurement and Preparation Tokens...")
+        # print("\nBuilding Measurement and Preparation Tokens...")
         for i in data['measurements']:
             measurements.add(i)
         for j in data['techniques']:
