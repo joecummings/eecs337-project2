@@ -4,7 +4,8 @@ import re
 import string
 import scraper as s
 import wiki
-from types import types
+import pickle
+# from types import types
 import pdb
 ingredients = set([])
 tokenizer = MWETokenizer()
@@ -163,9 +164,12 @@ def build_ingredient(s,index):
     tags = {}
     tags['veggie'] = 0
     tags['meat'] = 0
+    ####
     tags['healthy'] = 0
     tags['mexican'] = 0
     tags['chinese'] = 0
+    tags['vegetarian'] = 0
+    tags['type'] = ''
 
     match = re.search(r'\((.*?)\)', s)
     if match is not None:
@@ -178,6 +182,9 @@ def build_ingredient(s,index):
     preparation = ""
     name = tag_ingredient_name(words)
 
+    with open('foodtypes.pickle', 'rb') as handle:
+        types = pickle.load(handle)
+
     threshold = 3
     #tags
     if name in meats:
@@ -188,11 +195,10 @@ def build_ingredient(s,index):
     if name in chinese:
         if chinese[name] > threshold:
             tags['chinese'] = 1
-
-    t = types()
-    for type in t:
-        print(t[type])
-        pdb.set_trace()
+    if name in types.keys():
+        tags['type'] = types[name]
+    else:
+        tags['type'] = 'untyped'
         
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)

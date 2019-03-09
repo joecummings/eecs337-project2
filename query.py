@@ -6,10 +6,10 @@ import json
 import recipe as r
 import wiki
 from transform import *
+# from transform import *
 import pdb
 query = ""
 
-#FOR SAMPLE OUTPUT ---- Run: python query.py
 def main():
     r.load_ingredients()
     r.build_tokenizer()
@@ -19,43 +19,53 @@ def main():
 
     print("Recipe Link: {0}".format(query))
     recipe = get_url(query)
-    print_recipe(recipe)
+    # print_recipe(recipe)
     
-
-    print("\n*** *** ***")
     next_action = ""
 
     while next_action != 'x':
+        print_recipe(recipe)
+        print("*** *** ***\n")
         print("Mexican -> m")
         print("Chinese -> c")
         print("Vegetarian -> v")
+        print("Non-vegetarian -> n")
         print("Healthy -> h")
+        print("Unhealthy -> u")
         print("Exit -> x")
         next_action = input("Select your next action/transformation: ")
         print("--- --- --- --- --- --- --- ---\n")
-        new_recipe = perform_transform(next_action,recipe)
-        print_recipe(new_recipe)
-
+        recipe = perform_transform(next_action,recipe)
+        
 def print_recipe(r):
+    print("\n*** *** ***")
     print("Recipe Title: {0}".format(r.name))
     print("Calorie Count: {0}".format(r.calories))
     print("\nINGREDIENTS\n")
     for i,gred in enumerate(r.ingredients):
-        print("\t"+ str(i+1) + ") " + str(gred))
-    print("DIRECTIONS")
+        print("\t"+ str(i+1) + ") " + str(gred[0]))
+    print("\nDIRECTIONS\n")
     for s in r.steps:
         print(s)
 
 def perform_transform(n,recipe):
-    if n == 'm':
-        pass
+    if n == 'x':
+        return
+    elif n == 'm':
+        return transform_to_mexican(recipe)
     elif n == 'c':
-        transform_to_chinese(recipe)
+        return transform_to_chinese(recipe)
     elif n == 'h':
-        pass
+        return transform_to_healthy(recipe)
+    elif n == 'u':
+        return transform_from_healthy(recipe)
     elif n == 'v':
-        pass
-    pass
+        return transform_to_vegetarian(recipe)
+    elif n == 'n':
+        return transform_to_nonvegetarian(recipe)
+    else:
+        raise Exception("Command not found")
+        
    
 def get_url(url):
     page = requests.get(url).text
@@ -101,12 +111,9 @@ def scrape_recipe(soup):
     ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
     count = 1
     for i in ingredients:
-        ingredient = r.build_ingredient(cleanhtml(str(i)),count)
-        # recipe.add_ingredient(ingredient)
-        ingredients[ingredients.index(i)] = cleanhtml(str(i))
+        parsed_i = r.build_ingredient(cleanhtml(str(i)),count)
+        recipe.add_ingredient([cleanhtml(str(i)), parsed_i])
         count+=1
-    
-    recipe.ingredients = ingredients
 
     try:
         # print("DIRECTIONS")

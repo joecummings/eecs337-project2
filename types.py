@@ -42,8 +42,6 @@ types = {
 		"watermelon","rock melon","miracle fruit","mulberry","nectarine","olive","orange","clementine","mandarine","blood orange","tangerine","papaya","passionfruit","peach","pear","williams pear","bartlett pear","persimmon","physalis","plum","prune",
 		"pineapple","pomegranate","pomelo","purple mangosteen","quince","raspberry","western raspberry","rambutan","redcurrant","salal berry","salmon berry","satsuma","star fruit","strawberry","tamarillo","ugli fruit","watermelon"],
 	"herbs":["Basil", "Chervil","Chives","Cilantro","Curry Leaves","Fenugreek","Mint","Oregano","Parsley","Rosemary","Shiso","Tarragon","Thai Basil","Thyme"]
-
+	"untypes": []
 }
-
-print(types)
 
