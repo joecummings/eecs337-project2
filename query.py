@@ -1,13 +1,7 @@
-from recipe import recipe
 import sys
 import requests
 from bs4 import BeautifulSoup
 import re
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 import json
 import recipe as r
 import wiki
@@ -24,6 +18,7 @@ def main():
     if "-url" not in sys.argv:
         pullrecipes()
     else:
+        print('hi')
         query = sys.argv[sys.argv.index("-url")+1]
         print("Recipe Link: {0}".format(query))
         get_url(query)
@@ -32,42 +27,17 @@ def get_url(url):
     page = requests.get(url).text
     soup = BeautifulSoup(page, 'html.parser')
     scrape_recipe(soup)
-<<<<<<< HEAD
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
-=======
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 
 def scrape_recipe(soup):
         # This is called when user wants to scrape for specific recipe site
         # Try functions were used to prevent any one element from stopping the operation
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-    retRecipe = recipe()
-
-=======
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
-=======
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
     try:
         rtitle = soup.find_all('h1')
         rtitle = cleanhtml(str(rtitle[0]))
     except:
         rtitle = 'NA'
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-    print("Recipe Title: {0}".format(rtitle))
-    retRecipe.name = "{0}".format(rtitle)
-    print(retRecipe.name)
-=======
     recipe = r.Recipe(rtitle)
     # print("Recipe Title: {0}".format(rtitle))
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
-=======
-    recipe = r.Recipe(rtitle)
-    # print("Recipe Title: {0}".format(rtitle))
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 
     try:
         starrating = soup.find_all('div',{'class':'rating-stars'})
@@ -101,28 +71,23 @@ def scrape_recipe(soup):
     ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
     count = 1
     for i in ingredients:
-<<<<<<< HEAD
-<<<<<<< HEAD
-        print(i) 
-        retRecipe.ingredients.append(i)
-=======
-=======
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
         ingredient = r.build_ingredient(cleanhtml(str(i)),count)
         recipe.add_ingredient(ingredient)
         ingredients[ingredients.index(i)] = cleanhtml(str(i))
         count+=1
+    
+    # recipe.
     # except:
         # ingredients = "NA"
 
-<<<<<<< HEAD
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
-=======
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 
     # for i in ingredients:
     #     print(i) 
-    print()
+
+    print('hi')
+    print(recipe.get_ingredients())
+    print('heya')
+
     try:
         print("DIRECTIONS")
 
@@ -136,31 +101,13 @@ def scrape_recipe(soup):
         directions = "NA"
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    for d in directions:
-        if d.strip() != "":
-            print("{0}) {1}".format(directions.index(d)+1,d))
-            retRecipe.directions.append("{0}) {1}".format(directions.index(d)+1,d))
-
-    return retRecipe
-=======
     for d in recipe.get_steps():
         print("{0}".format(d))
     print()
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
-=======
-    for d in recipe.get_steps():
-        print("{0}".format(d))
-    print()
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
-<<<<<<< HEAD
-  return cleantext.strip()
-=======
   return cleantext.strip()
 
 
@@ -174,4 +121,3 @@ def pullrecipes():
 
 if __name__ == "__main__":
     main()
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe

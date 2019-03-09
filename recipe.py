@@ -1,71 +1,20 @@
-<<<<<<< HEAD
-from util import find_nth
-import nltk
-
-class recipe:
-    def __init__ (self):
-        self.url = ""
-        self.name = ""
-        self.ingredients = []
-        self.directions = []
-        self.methods = []
-        self.tools = [[]]
-        self.refineHa = True
-
-    def refine(self):
-
-        #Check
-        if not self.refineHa:
-            print("Already Refined")
-            return None
-
-        
-        #Refine
-        print("Refinining ...")
-
-        new_ingredients = []
-        for unparsed_ing in self.ingredients:
-            n = find_nth(unparsed_ing," ",2)
-            quantity, unit = unparsed_ing[:n].split( )
-            name = unparsed_ing[n::].strip()
-            new_ingredients.append((quantity,unit,name))
-        self.ingredients = new_ingredients
-
-        for unparsed_dir in self.directions:
-            text = nltk.word_tokenize(unparsed_dir)
-            print(nltk.pos_tag(text))
-
-
-
-        
-        
-
-        #Lock It - Haha worst lock of all time
-        self.refineHa = False
-
-class ingredient:
-    def __init__(self,originalString):
-        self.name = ""
-        self.quantity = 0
-        self.measurement = ''
-        self.unitType = '' #Like American or not
-        self.healthy = 0 # Use Bools to represent how this ingredient does
-        self.vegan = 0
-        self.cuisine = 0
-=======
 from nltk import MWETokenizer
 import json
 import re
 import string
 import scraper as s
 import wiki
+import pdb
 ingredients = set([])
 tokenizer = MWETokenizer()
 measurements = set([])
 techniques = set([])
 meats = set([])
 veggies = set([])
+mexican = set([])
+chinese = set([])
 food = set([])
+
 
 def pull_meat():
     meats = wiki.pull_wikidata_meat()
@@ -73,6 +22,7 @@ def pull_meat():
 def pull_veggies():
     veggies = wiki.pull_all_vegetables()
     return veggies
+
 
 # def pull_nyt(recipes):
 #     res = s.pull_ingredients(recipes)
@@ -105,6 +55,15 @@ def load_ingredients():
     with open("ingredients.json") as file:
         data = json.load(file)
         for i in data:
+
+            if i['cuisine'] == 'mexican':
+                for ingredient in i['ingredients']:
+                    mexican.add(ingredient.replace(" ", "_"))
+
+            elif i['cuisine'] == 'chinese':
+                for ingredient in i['ingredients']:
+                    chinese.add(ingredient.replace(" ", "_"))
+
             for ingredient in i['ingredients']:
                 food.add(ingredient.replace(" ", "_"))                
     #Load Foods from Wikidata
@@ -185,27 +144,33 @@ class Ingredient:
 
 
 def build_ingredient(s,index):
-    veggie = ""
-    meat = ""
+    #tags
+    tags = {}
+    tags['veggie'] = 0
+    tags['meat'] = 0
+    tags['healthy'] = 0
+    tags['mexican'] = 0
+    tags['chinese'] = 0
+
     match = re.search(r'\((.*?)\)', s)
     if match is not None:
         alternate_measurement = match.groups()[0]
         s = s.replace("(" + alternate_measurement + ")", "")
     else:
         alternate_measurement = "N/A"
-    # if ", " in s:
-    #     prep = s.split(", ")
-    #     preparation = prep[1]
-    #     phrase = prep[0]
-    # else:
-    #     phrase = s
-    #     preparation = ""
     phrase = s.replace(",", "").lower()
     words = tokenizer.tokenize(phrase.split())
     preparation = ""
     name = tag_ingredient_name(words)
+
+    #tags
     if name in meats:
-        meat = "MEAT"
+        tags['meats'] = 1
+    if name in mexican:
+        tags['mexican'] = 1
+    if name in chinese:
+        tags['chinese'] = 1
+        
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)
     sent = sent.replace(quantity, "")
@@ -215,11 +180,12 @@ def build_ingredient(s,index):
     sent = " ".join(words)
     sent = sent.replace(measurement, "")
     
-    print("\t"+ str(index) + ") " + "{1} {2} {0} {3}".format(name.replace("_"," "), quantity, measurement,meat).strip().replace("  ", " "))
+    print("\t"+ str(index) + ") " + "{1} {2} {0} {3}".format(name.replace("_"," "), quantity, measurement,tags).strip().replace("  ", " "))
 
     # print("Ingredient: {0} -- Quantity: {1} -- Measurement-- {2} -- Preparation: {3} -- Descriptors: {4}".format(
     #     name, quantity, measurement, preparation, sent))
-    return s
+    # return s
+    return [name.replace("_"," "), quantity, measurement,tags]
 
 def tag_ingredient_measurement(words):
     measure = ""
@@ -248,4 +214,3 @@ def tag_ingredient_quantity(words, ingredient):
     else:
         qty = " ".join(qty)
     return qty
->>>>>>> 3806e8fc8af0634e9535d29c0744e4d547df8ebe
