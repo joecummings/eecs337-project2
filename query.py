@@ -7,14 +7,18 @@ import recipe as r
 import wiki
 query = ""
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> c94bca5d32195d3f1999acdf751849b377484998
 #FOR SAMPLE OUTPUT ---- Run: python query.py
 def main():
     r.load_ingredients()
     r.build_tokenizer()
     r.load_corpus()
 
+<<<<<<< HEAD
     if "-url" not in sys.argv:
         pullrecipes()
     else:
@@ -23,6 +27,30 @@ def main():
         print("Recipe Link: {0}".format(query))
         get_url(query)
         
+=======
+    query = input("Please provide an AllRecipes url: ")
+
+    print("Recipe Link: {0}".format(query))
+    get_url(query)
+
+    print("*** *** ***")
+    next_action = ""
+
+    while next_action != 'x':
+        print("Mexican -> m")
+        print("Chinese -> c")
+        print("Vegetarian -> v")
+        print("Healthy -> h")
+        print("Exit -> x")
+        next_action = input("Select your next action/transformation: ")
+        print("--- --- --- --- --- --- --- ---")
+        perform_transform(next_action)
+        
+
+def perform_transform(n):
+    pass
+   
+>>>>>>> c94bca5d32195d3f1999acdf751849b377484998
 def get_url(url):
     page = requests.get(url).text
     soup = BeautifulSoup(page, 'html.parser')
@@ -37,7 +65,11 @@ def scrape_recipe(soup):
     except:
         rtitle = 'NA'
     recipe = r.Recipe(rtitle)
+<<<<<<< HEAD
     # print("Recipe Title: {0}".format(rtitle))
+=======
+    print("Recipe Title: {0}".format(rtitle))
+>>>>>>> c94bca5d32195d3f1999acdf751849b377484998
 
     try:
         starrating = soup.find_all('div',{'class':'rating-stars'})
@@ -75,6 +107,7 @@ def scrape_recipe(soup):
         recipe.add_ingredient(ingredient)
         ingredients[ingredients.index(i)] = cleanhtml(str(i))
         count+=1
+<<<<<<< HEAD
     
     # recipe.
     # except:
@@ -87,7 +120,15 @@ def scrape_recipe(soup):
     print('hi')
     print(recipe.get_ingredients())
     print('heya')
+=======
+    # except:
+        # ingredients = "NA"
 
+>>>>>>> c94bca5d32195d3f1999acdf751849b377484998
+
+    # for i in ingredients:
+    #     print(i) 
+    print()
     try:
         print("DIRECTIONS")
 
