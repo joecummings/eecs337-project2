@@ -12,11 +12,6 @@ meats = set([])
 veggies = set([])
 mexican = {}
 chinese = {}
-
-# mexican = set([])
-# chinese = set([])
-# mexican = []
-# chinese = []
 food = set([])
 
 
@@ -201,7 +196,7 @@ def build_ingredient(s,index):
     sent = " ".join(words)
     sent = sent.replace(measurement, "")
     
-    print("\t"+ str(index) + ") " + "{1} {2} {0} {3}".format(name.replace("_"," "), quantity, measurement,tags).strip().replace("  ", " "))
+    # print("\t"+ str(index) + ") " + "{1} {2} {0} {3}".format(name.replace("_"," "), quantity, measurement,tags).strip().replace("  ", " "))
 
     return [name.replace("_"," "), quantity, measurement,tags]
 
