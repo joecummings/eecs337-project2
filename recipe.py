@@ -4,6 +4,8 @@ import re
 import string
 import scraper as s
 import wiki
+from types import types
+import pdb
 ingredients = set([])
 tokenizer = MWETokenizer()
 measurements = set([])
@@ -12,11 +14,6 @@ meats = set([])
 veggies = set([])
 mexican = {}
 chinese = {}
-
-# mexican = set([])
-# chinese = set([])
-# mexican = []
-# chinese = []
 food = set([])
 
 
@@ -191,6 +188,11 @@ def build_ingredient(s,index):
     if name in chinese:
         if chinese[name] > threshold:
             tags['chinese'] = 1
+
+    t = types()
+    for type in t:
+        print(t[type])
+        pdb.set_trace()
         
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)
