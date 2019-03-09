@@ -4,7 +4,7 @@ import re
 import string
 import scraper as s
 import wiki
-from types import types
+# from types import types
 import pdb
 ingredients = set([])
 tokenizer = MWETokenizer()

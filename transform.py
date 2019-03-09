@@ -7,10 +7,8 @@ def transform_to_healthy():
     pass
 
 def transform_to_chinese(r):
-    # print(r.ingredients)
-    # print(r.steps)
-    print(mexican)
-    print(chinese)
+    for i in r.ingredients:
+        if i not 
 
 
     pass
