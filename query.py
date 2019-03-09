@@ -5,11 +5,10 @@ import re
 import json
 import recipe as r
 import wiki
-from transform import *
+# from transform import *
 import pdb
 query = ""
 
-#FOR SAMPLE OUTPUT ---- Run: python query.py
 def main():
     r.load_ingredients()
     r.build_tokenizer()
@@ -17,12 +16,14 @@ def main():
 
     query = input("Please provide an AllRecipes url: ")
 
+    print("\n*** *** ***")
+
     print("Recipe Link: {0}".format(query))
     recipe = get_url(query)
     print_recipe(recipe)
     
 
-    print("\n*** *** ***")
+    print("*** *** ***\n")
     next_action = ""
 
     while next_action != 'x':
@@ -43,12 +44,14 @@ def print_recipe(r):
     print("Calorie Count: {0}".format(r.calories))
     print("\nINGREDIENTS\n")
     for i,gred in enumerate(r.ingredients):
-        print("\t"+ str(i+1) + ") " + str(gred))
-    print("DIRECTIONS")
+        print("\t"+ str(i+1) + ") " + str(gred[0]))
+    print("\nDIRECTIONS\n")
     for s in r.steps:
         print(s)
 
 def perform_transform(n,recipe):
+    if n == 'x':
+        return
     if n == 'm':
         pass
     elif n == 'c':
@@ -103,12 +106,9 @@ def scrape_recipe(soup):
     ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
     count = 1
     for i in ingredients:
-        ingredient = r.build_ingredient(cleanhtml(str(i)),count)
-        # recipe.add_ingredient(ingredient)
-        ingredients[ingredients.index(i)] = cleanhtml(str(i))
+        parsed_i = r.build_ingredient(cleanhtml(str(i)),count)
+        recipe.add_ingredient([cleanhtml(str(i)), parsed_i])
         count+=1
-    
-    recipe.ingredients = ingredients
 
     try:
         # print("DIRECTIONS")

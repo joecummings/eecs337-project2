@@ -189,10 +189,10 @@ def build_ingredient(s,index):
         if chinese[name] > threshold:
             tags['chinese'] = 1
 
-    t = types()
-    for type in t:
-        print(t[type])
-        pdb.set_trace()
+    # t = types()
+    # for type in t:
+    #     print(t[type])
+    #     pdb.set_trace()
         
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)
