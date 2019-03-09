@@ -5,9 +5,9 @@ import re
 import json
 import recipe as r
 import wiki
+from transform import *
+import pdb
 query = ""
-mexican = {}
-chinese = {}
 
 #FOR SAMPLE OUTPUT ---- Run: python query.py
 def main():
@@ -18,7 +18,8 @@ def main():
     query = input("Please provide an AllRecipes url: ")
 
     print("Recipe Link: {0}".format(query))
-    get_url(query)
+    recipe = get_url(query)
+    print(recipe.ingredients)
 
     print("*** *** ***")
     next_action = ""
@@ -31,16 +32,24 @@ def main():
         print("Exit -> x")
         next_action = input("Select your next action/transformation: ")
         print("--- --- --- --- --- --- --- ---")
-        perform_transform(next_action)
+        perform_transform(next_action,recipe)
         
 
-def perform_transform(n):
+def perform_transform(n,recipe):
+    if n == 'm':
+        pass
+    elif n == 'c':
+        transform_to_chinese(recipe)
+    elif n == 'h':
+        pass
+    elif n == 'v':
+        pass
     pass
    
 def get_url(url):
     page = requests.get(url).text
     soup = BeautifulSoup(page, 'html.parser')
-    scrape_recipe(soup)
+    return scrape_recipe(soup)
 
 def scrape_recipe(soup):
         # This is called when user wants to scrape for specific recipe site
@@ -59,7 +68,6 @@ def scrape_recipe(soup):
         recipe.set_rating(starrating)
     except:
         starrating = 'NA'
-    # print("Rating: {0} out of 5".format(starrating))
 
     try:
         reviewcount = soup.find_all("meta",{'itemprop':'reviewCount'})
@@ -67,8 +75,6 @@ def scrape_recipe(soup):
         recipe.set_number_of_reviews(reviewcount)
     except:
         reviewcount = 'NA'
-
-    # print("Number of Reviews: {0}".format(reviewcount))
 
     try:
         calcount = soup.find_all("span",{"class":'calorie-count'})
@@ -79,7 +85,6 @@ def scrape_recipe(soup):
 
     print("Calorie Count: {0}".format(calcount))
 
-    # try: 
     print("\nINGREDIENTS\n")
     
     ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
@@ -89,13 +94,7 @@ def scrape_recipe(soup):
         recipe.add_ingredient(ingredient)
         ingredients[ingredients.index(i)] = cleanhtml(str(i))
         count+=1
-    # except:
-        # ingredients = "NA"
 
-
-    # for i in ingredients:
-    #     print(i) 
-    print()
     try:
         print("DIRECTIONS")
 
@@ -108,10 +107,11 @@ def scrape_recipe(soup):
     except:
         directions = "NA"
 
-
     for d in recipe.get_steps():
         print("{0}".format(d))
-    print()
+    print(recipe.ingredients)
+    print('wtf')
+    return recipe
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
