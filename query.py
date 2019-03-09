@@ -5,6 +5,7 @@ import re
 import json
 import recipe as r
 import wiki
+from transform import *
 # from transform import *
 import pdb
 query = ""
@@ -16,17 +17,15 @@ def main():
 
     query = input("Please provide an AllRecipes url: ")
 
-    print("\n*** *** ***")
-
     print("Recipe Link: {0}".format(query))
     recipe = get_url(query)
-    print_recipe(recipe)
+    # print_recipe(recipe)
     
-
-    print("*** *** ***\n")
     next_action = ""
 
     while next_action != 'x':
+        print_recipe(recipe)
+        print("*** *** ***\n")
         print("Mexican -> m")
         print("Chinese -> c")
         print("Vegetarian -> v")
@@ -36,10 +35,10 @@ def main():
         print("Exit -> x")
         next_action = input("Select your next action/transformation: ")
         print("--- --- --- --- --- --- --- ---\n")
-        new_recipe = perform_transform(next_action,recipe)
-        print_recipe(new_recipe)
-
+        recipe = perform_transform(next_action,recipe)
+        
 def print_recipe(r):
+    print("\n*** *** ***")
     print("Recipe Title: {0}".format(r.name))
     print("Calorie Count: {0}".format(r.calories))
     print("\nINGREDIENTS\n")
@@ -52,15 +51,21 @@ def print_recipe(r):
 def perform_transform(n,recipe):
     if n == 'x':
         return
-    if n == 'm':
-        pass
+    elif n == 'm':
+        return transform_to_mexican(recipe)
     elif n == 'c':
-        transform_to_chinese(recipe)
+        return transform_to_chinese(recipe)
     elif n == 'h':
-        pass
+        return transform_to_healthy(recipe)
+    elif n == 'u':
+        return transform_from_healthy(recipe)
     elif n == 'v':
-        pass
-    pass
+        return transform_to_vegetarian(recipe)
+    elif n == 'n':
+        return transform_to_nonvegetarian(recipe)
+    else:
+        raise Exception("Command not found")
+        
    
 def get_url(url):
     page = requests.get(url).text
