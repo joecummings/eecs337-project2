@@ -10,8 +10,13 @@ measurements = set([])
 techniques = set([])
 meats = set([])
 veggies = set([])
-mexican = set([])
-chinese = set([])
+mexican = {}
+chinese = {}
+
+# mexican = set([])
+# chinese = set([])
+# mexican = []
+# chinese = []
 food = set([])
 
 
@@ -56,19 +61,34 @@ def load_ingredients():
 
             if i['cuisine'] == 'mexican':
                 for ingredient in i['ingredients']:
-                    mexican.add(ingredient.replace(" ", "_"))
 
-            elif i['cuisine'] == 'chinese':
+                    ingredient = ingredient.replace("_", " ")
+
+                    if ingredient in mexican:
+                        mexican[ingredient] += 1
+                    else:
+                        mexican[ingredient] = 1
+
+            if i['cuisine'] == 'chinese':
                 for ingredient in i['ingredients']:
-                    chinese.add(ingredient.replace(" ", "_"))
+
+                    ingredient = ingredient.replace("_", " ")
+
+                    if ingredient in chinese:
+                        chinese[ingredient] += 1
+                    else:
+                        chinese[ingredient] = 1
 
             for ingredient in i['ingredients']:
-                food.add(ingredient.replace(" ", "_"))                
+                food.add(ingredient.replace(" ", "_"))  
+
     #Load Foods from Wikidata
     wiki_ingredients = pull_wiki()
     for i in wiki_ingredients['ingredients']:
         food.add(i.replace(" ", "_"))
-    # print("Ingredients Loaded: {0}\n".format(len(food)))
+
+
+
 
 def load_corpus():
     with open("corpus.json") as file:
@@ -161,13 +181,16 @@ def build_ingredient(s,index):
     preparation = ""
     name = tag_ingredient_name(words)
 
+    threshold = 3
     #tags
     if name in meats:
         tags['meats'] = 1
     if name in mexican:
-        tags['mexican'] = 1
+        if mexican[name] > threshold:
+            tags['mexican'] = 1
     if name in chinese:
-        tags['chinese'] = 1
+        if chinese[name] > threshold:
+            tags['chinese'] = 1
         
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)
@@ -180,9 +203,6 @@ def build_ingredient(s,index):
     
     print("\t"+ str(index) + ") " + "{1} {2} {0} {3}".format(name.replace("_"," "), quantity, measurement,tags).strip().replace("  ", " "))
 
-    # print("Ingredient: {0} -- Quantity: {1} -- Measurement-- {2} -- Preparation: {3} -- Descriptors: {4}".format(
-    #     name, quantity, measurement, preparation, sent))
-    # return s
     return [name.replace("_"," "), quantity, measurement,tags]
 
 def tag_ingredient_measurement(words):
