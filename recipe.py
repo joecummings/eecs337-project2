@@ -20,16 +20,14 @@ with open('healthy.pickle', 'rb') as handle:
 
 def type(food,foodtypes):
     possibleHits = food.split()
-    print(possibleHit)
-    print(food)
-    pdb.set_trace()
     for h in possibleHits:
-        if h in foodtypes.keys():
-            print(h)
-            print(food)
-            print(foodtypes[h])
-            pdb.set_trace()
-            return (food,foodtypes[h])
+        for key in foodtypes.keys():
+            if h in key:
+                # print(h)
+                # print(food)
+                # print(foodtypes[key])
+                # pdb.set_trace()
+                return (food,foodtypes[key])
     return (food,'untyped')
 
 def pull_meat():
@@ -182,7 +180,7 @@ def build_ingredient(s,index):
         types = pickle.load(handle)
 
     name = name.replace('_',' ')
-    threshold = 3
+    threshold = 10
     meats = pull_meat()
     for n in name.split():
         if n in meats:
@@ -194,15 +192,8 @@ def build_ingredient(s,index):
     if name in chinese:
         if chinese[name] > threshold:
             tags['chinese'] = 1
-    tags['type'] = type(name,types)
-    # if name in types.keys():
-    #     print(types.keys())
-    #     print(name)
-    #     print(types[name])
-    #     pdb.set_trace()
-    #     tags['type'] = types[name]
-    # else:
-    #     tags['type'] = 'untyped'
+    tags['type'] = type(name,types)[1]
+
         
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)
