@@ -5,7 +5,6 @@ import string
 import scraper as s
 import wiki
 import pickle
-import pdb
 ingredients = set([])
 tokenizer = MWETokenizer()
 measurements = set([])
@@ -23,10 +22,6 @@ def type(food,foodtypes):
     for h in possibleHits:
         for key in foodtypes.keys():
             if h in key:
-                # print(h)
-                # print(food)
-                # print(foodtypes[key])
-                # pdb.set_trace()
                 return (food,foodtypes[key])
     return (food,'untyped')
 
