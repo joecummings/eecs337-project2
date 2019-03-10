@@ -80,21 +80,50 @@ def swap_ingredient(i, t):
     if type_of_food == 'untyped':
         return i
 
-    #filter for threshold
-    if t != 'chinese' and t != 'mexican':
-        threshold = 0
-    list_of_relevant_transformations= [k for (k,v) in list_of_relevant_transformations.items() if v > threshold]
-    #type them
-    list_of_relevant_transformations = list(map(type,list_of_relevant_transformations))
-    #filter by type
-    list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if v == type_of_food]
+    #start casing on it
+    if t == 'chinese' or t == 'mexican':
+        #filter for threshold
+        list_of_relevant_transformations= [k for (k,v) in list_of_relevant_transformations.items() if v > threshold]
+        #type them
+        list_of_relevant_transformations = list(map(type,list_of_relevant_transformations))
+        #filter by type
+        list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if v == type_of_food]
 
-    try:
-        og_name = i[1][0]
-        i[1][0] = list_of_relevant_transformations[0]
-        i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
-    except:
+        try:
+            og_name = i[1][0]
+            i[1][0] = list(list_of_relevant_transformations.keys())[0]
+            del transformations[t][i[1][0]] #trim the dict, rerun every time
+            i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+        except:
+            pass
+    elif t == 'unhealthy':
         pass
+    elif t == 'unvegetarian':
+
+        if type_of_food != 'proteins':
+            return i
+
+        if i[1][3][t[2:]] == 1:
+            try:
+                og_name = i[1][0]
+                i[1][0] = list(list_of_relevant_transformations.keys())[0]
+                del transformations[t][i[1][0]] #trim
+                i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+            except:
+                pass
+    elif t == 'healthy':
+        pass
+    elif t == 'vegetarian':
+        if i[1][3][t] == 0:
+            try:
+                og_name = i[1][0]
+                i[1][0] = list(list_of_relevant_transformations.keys())[0]
+                del transformations[t][i[1][0]] #trim
+                i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+            except:
+                pass
     return i
+
+
 
 
