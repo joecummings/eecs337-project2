@@ -15,39 +15,42 @@ veggies = set([])
 mexican = {}
 chinese = {}
 food = set([])
-
+healthy_fats = ['olive oil', 'sunflower oil', 'soybean oil', 'corn oil',  'sesame oil',  'peanut oil']
+healthy_protein = [ 'peas',  'beans', 'eggs', 'crab', 'fish','chicken', 'tofu', 'liver', 'turkey']
+healthy_dairy = [ 'fat free milk', 'low fat milk', 'yogurt',  'low fat cheese']
+healthy_salts = ['low sodium soy sauce', 'sea salt', 'kosher salt']
+healthy_grains = ['oat cereal', 'wild rice', 'oatmeal', 'whole rye', 'buckwheat', 'rolled oats', 'quinoa','bulgur', 'millet', 'brown rice', 'whole wheat pasta']
+healthy_sugars = ['real fruit jam', 'fruit juice concentrates', 'monk fruit extract', 'cane sugar', 'molasses', 'brown rice syrup' 'stevia', 'honey', 'maple syrup', 'agave syrup', 'coconut sugar', 'date sugar', 'sugar alcohols', 'brown sugar']
+healthy = healthy_dairy + healthy_fats + healthy_grains + healthy_protein + healthy_salts + healthy_sugars
 
 def pull_meat():
     meats = wiki.pull_wikidata_meat()
+    unaccounted = ['duck', 'goose', 'turkey', 'ground turkey', 'lamb', 'bison', 'rabbit', 'liver', 'giblets', 'duck eggs', 'catfish', 'cod', 'flounder', 'haddock', 'halibut', 'herring', 'mackerel', 'pollock', 'porgy', 'sea bass', 'snapper', 'swordfish', 'trout', 'tuna', 'clams', 'crab', 'crayfish', 'lobster', 'mussels', 'octopus', 'oysters', 'scallops', 'squid', 'calamari', 'shrimp']
+    [meats.add(x) for x in unaccounted]
     return meats
 def pull_veggies():
     veggies = wiki.pull_all_vegetables()
     return veggies
-
 def pull_wiki():
     res = wiki.pull_wikidata_food()
     return res
 
 def build_tokenizer():
-    # print("\nBuilding Multi Word Tokenizer...")
     for i in food:
         s = i.split("_")
         tokenizer.add_mwe(s)
     
 def load_ingredients():
     print("Loading...")
-    #Load Meats into Food set
+    wiki_ingredients = pull_wiki()
+    for i in wiki_ingredients['ingredients']:
+        food.add(i.replace(" ", "_"))
     meats = pull_meat()
     for i in meats:
         food.add(i.replace(" ", "_"))
-    #Load Veggies into Food set
-    # print("Loading veggies...")
     veggies = pull_veggies()
     for veggie in veggies:
         food.add(i.replace(" ", "_"))
-
-    # print("Loading all other Foods...")
-    #Load Foods from Ingredients.json File
     with open("ingredients.json") as file:
         data = json.load(file)
         for i in data:
@@ -75,15 +78,10 @@ def load_ingredients():
             for ingredient in i['ingredients']:
                 food.add(ingredient.replace(" ", "_"))  
 
-    #Load Foods from Wikidata
-    wiki_ingredients = pull_wiki()
-    for i in wiki_ingredients['ingredients']:
-        food.add(i.replace(" ", "_"))
 
 def load_corpus():
     with open("corpus.json") as file:
         data = json.load(file)
-        # print("\nBuilding Measurement and Preparation Tokens...")
         for i in data['measurements']:
             measurements.add(i)
         for j in data['techniques']:
@@ -177,13 +175,13 @@ def build_ingredient(s,index):
     with open('foodtypes.pickle', 'rb') as handle:
         types = pickle.load(handle)
 
-
-
     name = name.replace('_',' ')
     threshold = 3
-    #tags - meat doesn't work
-    if name in meats:
-        tags['meats'] = 1
+    meats = pull_meat()
+    for n in name.split():
+        if n in meats:
+            tags['meat'] = 1
+            break
     if name in mexican:
         if mexican[name] > threshold:
             tags['mexican'] = 1
@@ -204,8 +202,6 @@ def build_ingredient(s,index):
     sent = " ".join(words)
     sent = sent.replace(measurement, "")
     
-    # print("\t"+ str(index) + ") " + "{1} {2} {0} {3}".format(name.replace("_"," "), quantity, measurement,tags).strip().replace("  ", " "))
-
     return [name.replace("_"," "), quantity, measurement,tags]
 
 def tag_ingredient_measurement(words):

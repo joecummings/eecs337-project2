@@ -6,7 +6,6 @@ import json
 import recipe as r
 import wiki
 from transform import *
-# from transform import *
 import pdb
 query = ""
 
@@ -44,6 +43,7 @@ def print_recipe(r):
     print("\nINGREDIENTS\n")
     for i,gred in enumerate(r.ingredients):
         print("\t"+ str(i+1) + ") " + str(gred[0]))
+        print(gred[1][3])
     print("\nDIRECTIONS\n")
     for s in r.steps:
         print(s)
@@ -62,7 +62,7 @@ def perform_transform(n,recipe):
     elif n == 'v':
         return transform_to_vegetarian(recipe)
     elif n == 'n':
-        return transform_to_nonvegetarian(recipe)
+        return transform_from_vegetarian(recipe)
     else:
         raise Exception("Command not found")
         
