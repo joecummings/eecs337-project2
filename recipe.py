@@ -15,13 +15,22 @@ veggies = set([])
 mexican = {}
 chinese = {}
 food = set([])
-healthy_fats = ['olive oil', 'sunflower oil', 'soybean oil', 'corn oil',  'sesame oil',  'peanut oil']
-healthy_protein = [ 'peas',  'beans', 'eggs', 'crab', 'fish','chicken', 'tofu', 'liver', 'turkey']
-healthy_dairy = [ 'fat free milk', 'low fat milk', 'yogurt',  'low fat cheese']
-healthy_salts = ['low sodium soy sauce', 'sea salt', 'kosher salt']
-healthy_grains = ['oat cereal', 'wild rice', 'oatmeal', 'whole rye', 'buckwheat', 'rolled oats', 'quinoa','bulgur', 'millet', 'brown rice', 'whole wheat pasta']
-healthy_sugars = ['real fruit jam', 'fruit juice concentrates', 'monk fruit extract', 'cane sugar', 'molasses', 'brown rice syrup' 'stevia', 'honey', 'maple syrup', 'agave syrup', 'coconut sugar', 'date sugar', 'sugar alcohols', 'brown sugar']
-healthy = healthy_dairy + healthy_fats + healthy_grains + healthy_protein + healthy_salts + healthy_sugars
+with open('healthy.pickle', 'rb') as handle:
+        healthy = pickle.load(handle)
+
+def type(food,foodtypes):
+    possibleHits = food.split()
+    print(possibleHit)
+    print(food)
+    pdb.set_trace()
+    for h in possibleHits:
+        if h in foodtypes.keys():
+            print(h)
+            print(food)
+            print(foodtypes[h])
+            pdb.set_trace()
+            return (food,foodtypes[h])
+    return (food,'untyped')
 
 def pull_meat():
     meats = wiki.pull_wikidata_meat()
@@ -185,10 +194,15 @@ def build_ingredient(s,index):
     if name in chinese:
         if chinese[name] > threshold:
             tags['chinese'] = 1
-    if name in types.keys():
-        tags['type'] = types[name]
-    else:
-        tags['type'] = 'untyped'
+    tags['type'] = type(name,types)
+    # if name in types.keys():
+    #     print(types.keys())
+    #     print(name)
+    #     print(types[name])
+    #     pdb.set_trace()
+    #     tags['type'] = types[name]
+    # else:
+    #     tags['type'] = 'untyped'
         
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)
