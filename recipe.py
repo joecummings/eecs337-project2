@@ -5,7 +5,6 @@ import string
 import scraper as s
 import wiki
 import pickle
-# from types import types
 import pdb
 ingredients = set([])
 tokenizer = MWETokenizer()
@@ -24,10 +23,6 @@ def pull_meat():
 def pull_veggies():
     veggies = wiki.pull_all_vegetables()
     return veggies
-
-# def pull_nyt(recipes):
-#     res = s.pull_ingredients(recipes)
-#     return res
 
 def pull_wiki():
     res = wiki.pull_wikidata_food()
@@ -84,9 +79,6 @@ def load_ingredients():
     wiki_ingredients = pull_wiki()
     for i in wiki_ingredients['ingredients']:
         food.add(i.replace(" ", "_"))
-
-
-
 
 def load_corpus():
     with open("corpus.json") as file:
@@ -185,8 +177,11 @@ def build_ingredient(s,index):
     with open('foodtypes.pickle', 'rb') as handle:
         types = pickle.load(handle)
 
+
+
+    name = name.replace('_',' ')
     threshold = 3
-    #tags
+    #tags - meat doesn't work
     if name in meats:
         tags['meats'] = 1
     if name in mexican:
