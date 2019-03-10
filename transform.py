@@ -174,14 +174,10 @@ def swap_ingredient(i, t):
         if i[1][3][t] == 1:
             return i
 
-        print('hiya')
         og_name = i[1][0]
-        print(og_name)
         i[1][0] = list(list_of_relevant_transformations.keys())[0]
-        print(i[1][0])
         del transformations[t][i[1][0]] #trim
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
-        print(i[0])
 
     return i
 
