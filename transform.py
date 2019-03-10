@@ -1,5 +1,5 @@
 from recipe import *
-
+import copy
 with open('foodtypes.pickle', 'rb') as handle:
     foodtypes = pickle.load(handle)
 
@@ -28,9 +28,17 @@ for k,v in foodtypes.items():
 
 
 def transform_generic(transformation,r):
+    '''
+    Parameters:
+        transformation (string): type of transformation to make
+        r (Recipe): old recipe
+    Returns:
+        new recipe (Recipe)
+    '''
     new_recipe = Recipe(r.name + " - " + transformation)
-    ingredients = r.ingredients
-    for ingredient in ingredients:
+    new_steps = copy.deepcopy(r.steps)
+
+    for ingredient in r.ingredients:
         #un transfromations
         if transformation[:2] == 'un':
             if ingredient[1][3][transformation[2::]] == 0:
@@ -38,6 +46,8 @@ def transform_generic(transformation,r):
             else:
                 new_ingredient = swap_ingredient(ingredient, transformation)
                 new_recipe.add_ingredient(new_ingredient)
+                for i,s in enumerate(new_steps):
+                    new_steps[i] = s.replace(ingredient[1][0], new_ingredient[1][0])
         #normal
         else:
             if ingredient[1][3][transformation] == 1:
@@ -45,6 +55,10 @@ def transform_generic(transformation,r):
             else:
                 new_ingredient = swap_ingredient(ingredient, transformation)
                 new_recipe.add_ingredient(new_ingredient)
+                for i,s in enumerate(new_steps):
+                    new_steps[i] = s.replace(ingredient[1][0], new_ingredient[1][0])
+    for s in new_steps:
+        new_recipe.add_step(s)
     return new_recipe
 
 def transform_to_vegetarian(r):
@@ -75,6 +89,8 @@ def type(food):
     return (food,'untyped')
 
 def swap_ingredient(i, t):
+
+    i = copy.deepcopy(i)
 
     #variables
     type_of_food = i[1][3]['type']
