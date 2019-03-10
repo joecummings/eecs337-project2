@@ -84,26 +84,20 @@ def swap_ingredient(i, t):
 
     #start casing on it
     if t == 'chinese' or t == 'mexican':
-        #filter for threshold
+        #filter,type,filter
         list_of_relevant_transformations= [k for (k,v) in list_of_relevant_transformations.items() if v > threshold]
-        #type them
         list_of_relevant_transformations = list(map(type,list_of_relevant_transformations))
-        #filter by type
         list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if v == type_of_food]
 
-        print(list_of_relevant_transformations)
-        pdb.set_trace()
-
+        #make sure there's something
         if (len(list_of_relevant_transformations)) < 1:
             return i
 
+        #swap
         og_name = i[1][0]
         i[1][0] = list_of_relevant_transformations.pop(0)
+        del transformations[t][i[1][0]]
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
-        print(1[0])
-        print(i[1][0])
-        print('hi')
-        print(i[0])
 
     elif t == 'unhealthy':
         pass
@@ -121,7 +115,21 @@ def swap_ingredient(i, t):
             except:
                 pass
     elif t == 'healthy':
-        pass
+        if i[1][3][t] == 1:
+            return i
+        
+        list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations.items()]
+        list_of_relevant_transformations = list(map(type,list_of_relevant_transformations))
+        list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if v == type_of_food]
+
+        if len(list_of_relevant_transformations) < 1:
+            return i
+        
+        og_name = i[1][0]
+        i[1][0] = list_of_relevant_transformations[0]
+        del transformations[t][i[1][0]] #trim
+        i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+
     elif t == 'vegetarian':
         if i[1][3][t] == 0:
             try:
