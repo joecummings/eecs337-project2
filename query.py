@@ -22,7 +22,8 @@ def main():
     next_action = ""
 
     while next_action != 'x':
-        print_recipe(recipe)
+        if next_action == "":
+            print_recipe(recipe)
         print("*** *** ***\n")
         print("Mexican -> m")
         print("Chinese -> c")
@@ -33,7 +34,8 @@ def main():
         print("Exit -> x")
         next_action = input("Select your next action/transformation: ")
         print("--- --- --- --- --- --- --- ---\n")
-        recipe = perform_transform(next_action,recipe)
+        new_recipe = perform_transform(next_action,recipe)
+        print_recipe(new_recipe)
         
 def print_recipe(r):
     print("\n*** *** ***")
@@ -115,7 +117,6 @@ def scrape_recipe(soup):
 
     try:
         # print("DIRECTIONS")
-
         directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
         # print(directions)
         for i in directions:
