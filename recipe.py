@@ -152,13 +152,10 @@ class Ingredient:
 def build_ingredient(s,index):
     #tags
     tags = {}
-    tags['veggie'] = 0
-    tags['meat'] = 0
-    ####
     tags['healthy'] = 0
     tags['mexican'] = 0
     tags['chinese'] = 0
-    tags['vegetarian'] = 0
+    tags['vegetarian'] = 1
     tags['type'] = ''
 
     match = re.search(r'\((.*?)\)', s)
@@ -180,7 +177,7 @@ def build_ingredient(s,index):
     meats = pull_meat()
     for n in name.split():
         if n in meats:
-            tags['meat'] = 1
+            tags['vegetarian'] = 0
             break
     if name in mexican:
         if mexican[name] > threshold:
