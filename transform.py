@@ -62,11 +62,13 @@ def transform_to_mexican(r):
 def transform_to_chinese(r):
     return transform_generic("chinese",r)
 
+#Single Param
 def type(food):
     possibleHits = food.split()
     for h in possibleHits:
-        if h in foodtypes:
-            return (food,foodtypes[h])
+        for key in foodtypes.keys():
+            if h in key:
+                return (food,foodtypes[key])
     return (food,'untyped')
 
 def swap_ingredient(i, t):
@@ -89,13 +91,20 @@ def swap_ingredient(i, t):
         #filter by type
         list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if v == type_of_food]
 
-        try:
-            og_name = i[1][0]
-            i[1][0] = list(list_of_relevant_transformations.keys())[0]
-            del transformations[t][i[1][0]] #trim the dict, rerun every time
-            i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
-        except:
-            pass
+        print(list_of_relevant_transformations)
+        pdb.set_trace()
+
+        if (len(list_of_relevant_transformations)) < 1:
+            return i
+
+        og_name = i[1][0]
+        i[1][0] = list_of_relevant_transformations.pop(0)
+        i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+        print(1[0])
+        print(i[1][0])
+        print('hi')
+        print(i[0])
+
     elif t == 'unhealthy':
         pass
     elif t == 'unvegetarian':
