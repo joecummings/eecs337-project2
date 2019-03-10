@@ -5,7 +5,6 @@ import string
 import scraper as s
 import wiki
 import pickle
-import pdb
 ingredients = set([])
 tokenizer = MWETokenizer()
 measurements = set([])
@@ -15,13 +14,16 @@ veggies = set([])
 mexican = {}
 chinese = {}
 food = set([])
-healthy_fats = ['olive oil', 'sunflower oil', 'soybean oil', 'corn oil',  'sesame oil',  'peanut oil']
-healthy_protein = [ 'peas',  'beans', 'eggs', 'crab', 'fish','chicken', 'tofu', 'liver', 'turkey']
-healthy_dairy = [ 'fat free milk', 'low fat milk', 'yogurt',  'low fat cheese']
-healthy_salts = ['low sodium soy sauce', 'sea salt', 'kosher salt']
-healthy_grains = ['oat cereal', 'wild rice', 'oatmeal', 'whole rye', 'buckwheat', 'rolled oats', 'quinoa','bulgur', 'millet', 'brown rice', 'whole wheat pasta']
-healthy_sugars = ['real fruit jam', 'fruit juice concentrates', 'monk fruit extract', 'cane sugar', 'molasses', 'brown rice syrup' 'stevia', 'honey', 'maple syrup', 'agave syrup', 'coconut sugar', 'date sugar', 'sugar alcohols', 'brown sugar']
-healthy = healthy_dairy + healthy_fats + healthy_grains + healthy_protein + healthy_salts + healthy_sugars
+with open('healthy.pickle', 'rb') as handle:
+        healthy = pickle.load(handle)
+
+def type(food,foodtypes):
+    possibleHits = food.split()
+    for h in possibleHits:
+        for key in foodtypes.keys():
+            if h in key:
+                return (food,foodtypes[key])
+    return (food,'untyped')
 
 def pull_meat():
     meats = wiki.pull_wikidata_meat()
@@ -173,7 +175,7 @@ def build_ingredient(s,index):
         types = pickle.load(handle)
 
     name = name.replace('_',' ')
-    threshold = 3
+    threshold = 10
     meats = pull_meat()
     for n in name.split():
         if n in meats:
@@ -185,10 +187,8 @@ def build_ingredient(s,index):
     if name in chinese:
         if chinese[name] > threshold:
             tags['chinese'] = 1
-    if name in types.keys():
-        tags['type'] = types[name]
-    else:
-        tags['type'] = 'untyped'
+    tags['type'] = type(name,types)[1]
+
         
     quantity = tag_ingredient_quantity(words, name)
     sent = " ".join(words)

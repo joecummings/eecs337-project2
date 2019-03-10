@@ -1,8 +1,10 @@
 from recipe import *
-import pdb
 
 with open('foodtypes.pickle', 'rb') as handle:
     foodtypes = pickle.load(handle)
+
+with open('unhealthy.pickle', 'rb') as handle:
+    unhealthy = pickle.load(handle)
 
 meats = pull_meat()
 
@@ -11,7 +13,7 @@ transformations['chinese'] = chinese
 transformations['mexican'] = mexican
 
 transformations['healthy'] = {h:1 for h in healthy}
-transformations['unhealthy'] = {'greasy '+h:1 for h in healthy}
+transformations['unhealthy'] = unhealthy
 
 transformations['unvegetarian'] = {m:1 for m in meats}
 transformations['vegetarian'] = {}
@@ -27,7 +29,8 @@ for k,v in foodtypes.items():
 
 def transform_generic(transformation,r):
     new_recipe = Recipe(r.name + " - " + transformation)
-    for ingredient in r.ingredients:
+    ingredients = r.ingredients
+    for ingredient in ingredients:
         #un transfromations
         if transformation[:2] == 'un':
             if ingredient[1][3][transformation[2::]] == 0:
@@ -38,7 +41,7 @@ def transform_generic(transformation,r):
         #normal
         else:
             if ingredient[1][3][transformation] == 1:
-                new_recipe.add_ingredient(ingredient)   
+                new_recipe.add_ingredient(ingredient)
             else:
                 new_ingredient = swap_ingredient(ingredient, transformation)
                 new_recipe.add_ingredient(new_ingredient)
@@ -62,11 +65,13 @@ def transform_to_mexican(r):
 def transform_to_chinese(r):
     return transform_generic("chinese",r)
 
+#Single Param
 def type(food):
     possibleHits = food.split()
     for h in possibleHits:
-        if h in foodtypes:
-            return (food,foodtypes[h])
+        for key in foodtypes.keys():
+            if h in key:
+                return (food,foodtypes[key])
     return (food,'untyped')
 
 def swap_ingredient(i, t):
@@ -82,22 +87,43 @@ def swap_ingredient(i, t):
 
     #start casing on it
     if t == 'chinese' or t == 'mexican':
-        #filter for threshold
+        #filter,type,filter
         list_of_relevant_transformations= [k for (k,v) in list_of_relevant_transformations.items() if v > threshold]
-        #type them
         list_of_relevant_transformations = list(map(type,list_of_relevant_transformations))
-        #filter by type
         list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if v == type_of_food]
 
-        try:
-            og_name = i[1][0]
-            i[1][0] = list(list_of_relevant_transformations.keys())[0]
-            del transformations[t][i[1][0]] #trim the dict, rerun every time
-            i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
-        except:
-            pass
+        #make sure there's something
+        if (len(list_of_relevant_transformations)) < 1:
+            return i
+
+        #swap
+        og_name = i[1][0]
+        i[1][0] = list_of_relevant_transformations.pop(0)
+        del transformations[t][i[1][0]]
+        i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+
     elif t == 'unhealthy':
-        pass
+
+        if type_of_food != 'proteins' or type_of_food != 'oil':
+            return i
+
+        if i[1][3][t[2:]] == 0:
+            return i
+            
+        list_of_relevant_transformations= [k for (k,v) in list_of_relevant_transformations.items()]
+        list_of_relevant_transformations = list(map(type,list_of_relevant_transformations))
+        list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if (v == 'proteins' or v == 'oil')]
+
+        #make sure there's something
+        if (len(list_of_relevant_transformations)) < 1:
+            return i
+
+        #swap
+        og_name = i[1][0]
+        i[1][0] = list_of_relevant_transformations.pop(0)
+        del transformations[t][i[1][0]]
+        i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+            
     elif t == 'unvegetarian':
 
         if type_of_food != 'proteins':
@@ -112,7 +138,21 @@ def swap_ingredient(i, t):
             except:
                 pass
     elif t == 'healthy':
-        pass
+        if i[1][3][t] == 1:
+            return i
+        
+        list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations.items()]
+        list_of_relevant_transformations = list(map(type,list_of_relevant_transformations))
+        list_of_relevant_transformations = [k for (k,v) in list_of_relevant_transformations if v == type_of_food]
+
+        if len(list_of_relevant_transformations) < 1:
+            return i
+        
+        og_name = i[1][0]
+        i[1][0] = list_of_relevant_transformations[0]
+        del transformations[t][i[1][0]] #trim
+        i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
+
     elif t == 'vegetarian':
         if i[1][3][t] == 0:
             try:

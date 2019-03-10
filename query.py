@@ -6,7 +6,6 @@ import json
 import recipe as r
 import wiki
 from transform import *
-import pdb
 query = ""
 
 def main():
