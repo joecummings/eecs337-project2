@@ -42,7 +42,6 @@ def print_recipe(r):
     print("\nINGREDIENTS\n")
     for i,gred in enumerate(r.ingredients):
         print("\t"+ str(i+1) + ") " + str(gred[0]))
-        print(gred[1][3])
     print("\nDIRECTIONS\n")
     for s in r.steps:
         print(s)
