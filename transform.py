@@ -30,7 +30,8 @@ for k,v in foodtypes.items():
 
 def transform_generic(transformation,r):
     new_recipe = Recipe(r.name + " - " + transformation)
-    for ingredient in r.ingredients:
+    ingredients = r.ingredients
+    for ingredient in ingredients:
         #un transfromations
         if transformation[:2] == 'un':
             if ingredient[1][3][transformation[2::]] == 0:
@@ -41,7 +42,14 @@ def transform_generic(transformation,r):
         #normal
         else:
             if ingredient[1][3][transformation] == 1:
-                new_recipe.add_ingredient(ingredient)   
+                print(r.ingredients)
+                print('---')
+                print(new_recipe.ingredients)
+                new_recipe.add_ingredient(ingredient)
+                print(r.ingredients)
+                print('---')
+                print(new_recipe.ingredients)
+                pdb.set_trace()
             else:
                 new_ingredient = swap_ingredient(ingredient, transformation)
                 new_recipe.add_ingredient(new_ingredient)
