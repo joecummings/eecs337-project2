@@ -1,4 +1,4 @@
-from nltk import MWETokenizer
+from nltk import MWETokenizer, sent_tokenize
 import json
 import re
 import string
@@ -7,10 +7,11 @@ import wiki
 import pickle
 ingredients = set([])
 tokenizer = MWETokenizer()
+utensil_tokenizer = MWETokenizer()
 measurements = set([])
 techniques = set([])
-meats = set([])
-veggies = set([])
+
+
 mexican = {}
 chinese = {}
 food = set([])
@@ -33,26 +34,31 @@ def pull_meat():
 def pull_veggies():
     veggies = wiki.pull_all_vegetables()
     return veggies
+def pull_utensils():
+    utensils = wiki.pull_wikidata_utensils();
+    return utensils
 def pull_wiki():
     res = wiki.pull_wikidata_food()
     return res
+utensils = pull_utensils()
+utensils.add('bowl')
+meats = pull_meat()
+veggies = pull_veggies()
 
 def build_tokenizer():
     for i in food:
         s = i.split("_")
         tokenizer.add_mwe(s)
-    
+    for u in utensils:
+        i = u.lower().split("_")
+        utensil_tokenizer.add_mwe(i)
+
 def load_ingredients():
     print("Loading...")
     wiki_ingredients = pull_wiki()
     for i in wiki_ingredients['ingredients']:
         food.add(i.replace(" ", "_"))
-    meats = pull_meat()
-    for i in meats:
-        food.add(i.replace(" ", "_"))
-    veggies = pull_veggies()
-    for veggie in veggies:
-        food.add(i.replace(" ", "_"))
+
     with open("ingredients.json") as file:
         data = json.load(file)
         for i in data:
@@ -150,7 +156,22 @@ class Ingredient:
         self.descriptor = descriptor
         self.preparation = preparation
 
+def organize_directions(s):
+    referenced_utensils = set([])
+    sent_list = sent_tokenize(s)
+    print("")
+    for s in sent_list:
+        used = extract_utensils(s)
+        referenced_utensils = referenced_utensils.union(used)
+    return sent_list, referenced_utensils
 
+def extract_utensils(sentence):
+    used = set([])
+    tokens = utensil_tokenizer.tokenize(sentence.replace(",","").split())
+    for token in tokens:
+        if token in utensils and token not in measurements:
+            used.add(token)
+    return used
 def build_ingredient(s,index):
     #tags
     tags = {}

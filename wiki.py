@@ -100,6 +100,58 @@ limit 1000
 
   return veggies
 
+def pull_wikidata_utensils():
+  query = '''
+  PREFIX wikibase: <http://wikiba.se/ontology#>
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  SELECT ?utensilLabel WHERE {
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+      ?utensil wdt:P279 wd:Q3773693
+  }
+  LIMIT 1000
+  '''
+  query2 = '''
+  PREFIX wikibase: <http://wikiba.se/ontology#>
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  SELECT ?utensilLabel WHERE {
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+      ?utensil wdt:P279 wd:Q851782
+  }
+  LIMIT 1000
+  '''
+
+  query3 = '''
+  PREFIX wikibase: <http://wikiba.se/ontology#>
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  SELECT ?utensilLabel WHERE {
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+      ?utensil wdt:P279* wd:Q1521410
+  }
+  LIMIT 1000
+  '''
+
+  url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+  utensils = set([])
+  data = requests.get(url, params={'query': query, 'format': 'json'}).json()
+  for i in data['results']['bindings']:
+    if not hasNumbers(i['utensilLabel']['value'].lower()):
+      utensils.add(i['utensilLabel']['value'].replace(" ", "_"))
+  data = requests.get(url, params={'query': query2, 'format': 'json'}).json()
+  for i in data['results']['bindings']:
+    if not hasNumbers(i['utensilLabel']['value'].lower()):
+      utensils.add(i['utensilLabel']['value'].replace(" ", "_"))
+  data = requests.get(url, params={'query': query3, 'format': 'json'}).json()
+  for i in data['results']['bindings']:
+    if not hasNumbers(i['utensilLabel']['value'].lower()):
+      utensils.add(i['utensilLabel']['value'].replace(" ", "_"))
+  return utensils
+
 
 
 
