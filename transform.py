@@ -1,5 +1,7 @@
 from recipe import *
 import copy
+from random import choice 
+
 with open('foodtypes.pickle', 'rb') as handle:
     foodtypes = pickle.load(handle)
 
@@ -114,7 +116,7 @@ def swap_ingredient(i, t):
 
         #swap
         og_name = i[1][0]
-        i[1][0] = list_of_relevant_transformations.pop(0)
+        i[1][0] = choice(list_of_relevant_transformations)
         del transformations[t][i[1][0]]
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
@@ -136,7 +138,7 @@ def swap_ingredient(i, t):
 
         #swap
         og_name = i[1][0]
-        i[1][0] = list_of_relevant_transformations.pop(0)
+        i[1][0] = choice(list_of_relevant_transformations)
         del transformations[t][i[1][0]]
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
             
@@ -149,7 +151,7 @@ def swap_ingredient(i, t):
             return i
                 
         og_name = i[1][0]
-        i[1][0] = list(list_of_relevant_transformations.keys())[0]
+        i[1][0] = choice(list(list_of_relevant_transformations.keys()))
         del transformations[t][i[1][0]] #trim
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
@@ -165,7 +167,7 @@ def swap_ingredient(i, t):
             return i
         
         og_name = i[1][0]
-        i[1][0] = list_of_relevant_transformations[0]
+        i[1][0] = choice(list_of_relevant_transformations)
         del transformations[t][i[1][0]] #trim
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
@@ -174,14 +176,10 @@ def swap_ingredient(i, t):
         if i[1][3][t] == 1:
             return i
 
-        print('hiya')
         og_name = i[1][0]
-        print(og_name)
-        i[1][0] = list(list_of_relevant_transformations.keys())[0]
-        print(i[1][0])
+        i[1][0] = choice(list(list_of_relevant_transformations.keys()))
         del transformations[t][i[1][0]] #trim
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
-        print(i[0])
 
     return i
 
