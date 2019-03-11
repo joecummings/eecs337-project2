@@ -120,10 +120,6 @@ def scrape_recipe(soup):
         count+=1
 
     try:
-<<<<<<< HEAD
-        # print("DIRECTIONS")
-=======
->>>>>>> 94aa7ffb750a4e6658673b55a802312c1fb55bbd
         directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
         utensils = set([])
         for i in directions:
