@@ -175,7 +175,7 @@ def extract_utensils(sentence):
 def build_ingredient(s,index):
     #tags
     tags = {}
-    tags['healthy'] = 0
+    tags['healthy'] = 1
     tags['mexican'] = 0
     tags['chinese'] = 0
     tags['vegetarian'] = 1
@@ -195,12 +195,19 @@ def build_ingredient(s,index):
     with open('foodtypes.pickle', 'rb') as handle:
         types = pickle.load(handle)
 
+    with open('unhealthy.pickle', 'rb') as handle:
+        unhealthy = pickle.load(handle)
+
     name = name.replace('_',' ')
     threshold = 10
     meats = pull_meat()
     for n in name.split():
         if n in meats:
             tags['vegetarian'] = 0
+            break
+    for n in name.split():
+        if n in unhealthy:
+            tags['healthy'] = 0
             break
     if name in mexican:
         if mexican[name] > threshold:

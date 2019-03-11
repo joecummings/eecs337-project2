@@ -61,13 +61,8 @@ def transform_generic(transformation,r):
                 new_recipe.add_ingredient(new_ingredient)
                 for i,s in enumerate(new_steps):
                     new_steps[i] = s.replace(ingredient[1][0], new_ingredient[1][0])
-    
-    for t in r.get_tools():
-        new_recipe.add_tool(t)
-    
     for s in new_steps:
         new_recipe.add_step(s)
-        
     return new_recipe
 
 def transform_to_vegetarian(r):
@@ -129,8 +124,8 @@ def swap_ingredient(i, t):
 
     elif t == 'unhealthy':
 
-        if type_of_food != 'proteins' or type_of_food != 'oil':
-            return i
+        # if type_of_food != 'proteins' or type_of_food != 'oil':
+        #     return i
 
         if i[1][3][t[2:]] == 0:
             return i
@@ -164,7 +159,7 @@ def swap_ingredient(i, t):
 
     elif t == 'healthy':
 
-        if type_of_food != 'proteins' or type_of_food != 'oil':
+        if type_of_food != 'proteins' and type_of_food != 'oil':
             return i
 
         if i[1][3][t] == 1:
