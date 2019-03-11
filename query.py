@@ -38,13 +38,13 @@ def main():
 def print_recipe(r):
     print("\n*** *** ***")
     print("Recipe Title: {0}".format(r.name))
-    print("Calorie Count: {0}".format(r.calories))
+    # print("Calorie Count: {0}".format(r.calories))
     print("\nINGREDIENTS\n")
     for i,gred in enumerate(r.ingredients):
-        print("\t"+ str(i+1) + ") " + str(gred[0]))
+        print("\t"+ "- " + str(gred[0]))
     print("\nKITCHEN UTENSILS\n")
     for tool in r.get_tools():
-        print("\t",tool)
+        print("\t"+ "- ",tool)
     print("\nDIRECTIONS\n")
     for i, step in enumerate(r.steps):
         print("\t" + str(i + 1) + ") " + str(step))
