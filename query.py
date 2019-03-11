@@ -54,7 +54,7 @@ def print_recipe(r):
 
 def perform_transform(n,recipe):
     if n == 'x':
-        return
+        exit(0)
     elif n == 'm':
         return transform_to_mexican(recipe)
     elif n == 'c':
