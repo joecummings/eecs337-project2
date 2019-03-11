@@ -28,7 +28,7 @@ def type(food,foodtypes):
 
 def pull_meat():
     meats = wiki.pull_wikidata_meat()
-    unaccountedandfish = ['oysters', 'cod', 'duck', 'pollock', 'herring', 'snapper', 'duck eggs', 'giblets', 'scallops', 'lobster', 'goose', 'crab', 'rabbit', 'lamb', 'clams', 'catfish', 'mussels', 'calamari', 'shrimp', 'sea bass', 'tuna', 'octopus', 'liver', 'turkey', 'porgy', 'swordfish', 'ground turkey', 'squid']
+    unaccountedandfish = ['bison','oysters', 'cod', 'duck', 'pollock', 'herring', 'snapper', 'duck eggs', 'giblets', 'scallops', 'lobster', 'goose', 'crab', 'rabbit', 'lamb', 'clams', 'catfish', 'mussels', 'calamari', 'shrimp', 'sea bass', 'tuna', 'octopus', 'liver', 'turkey', 'porgy', 'swordfish', 'ground turkey', 'squid']
     [meats.add(x) for x in unaccountedandfish]
     return meats
 def pull_veggies():
