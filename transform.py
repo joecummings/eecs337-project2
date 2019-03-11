@@ -1,5 +1,7 @@
 from recipe import *
 import copy
+from random import choice 
+
 with open('foodtypes.pickle', 'rb') as handle:
     foodtypes = pickle.load(handle)
 
@@ -25,6 +27,8 @@ for k,v in foodtypes.items():
                 local_bool = False
         if local_bool:
             transformations['vegetarian'][k] = 1
+
+
 
 
 def transform_generic(transformation,r):
@@ -57,8 +61,13 @@ def transform_generic(transformation,r):
                 new_recipe.add_ingredient(new_ingredient)
                 for i,s in enumerate(new_steps):
                     new_steps[i] = s.replace(ingredient[1][0], new_ingredient[1][0])
+    
+    for t in r.get_tools():
+        new_recipe.add_tool(t)
+    
     for s in new_steps:
         new_recipe.add_step(s)
+        
     return new_recipe
 
 def transform_to_vegetarian(r):
@@ -114,7 +123,7 @@ def swap_ingredient(i, t):
 
         #swap
         og_name = i[1][0]
-        i[1][0] = list_of_relevant_transformations.pop(0)
+        i[1][0] = choice(list_of_relevant_transformations)
         del transformations[t][i[1][0]]
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
@@ -136,7 +145,7 @@ def swap_ingredient(i, t):
 
         #swap
         og_name = i[1][0]
-        i[1][0] = list_of_relevant_transformations.pop(0)
+        i[1][0] = choice(list_of_relevant_transformations)
         del transformations[t][i[1][0]]
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
             
@@ -149,11 +158,15 @@ def swap_ingredient(i, t):
             return i
                 
         og_name = i[1][0]
-        i[1][0] = list(list_of_relevant_transformations.keys())[0]
+        i[1][0] = choice(list(list_of_relevant_transformations.keys()))
         del transformations[t][i[1][0]] #trim
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
     elif t == 'healthy':
+
+        if type_of_food != 'proteins' or type_of_food != 'oil':
+            return i
+
         if i[1][3][t] == 1:
             return i
         
@@ -165,23 +178,23 @@ def swap_ingredient(i, t):
             return i
         
         og_name = i[1][0]
-        i[1][0] = list_of_relevant_transformations[0]
+        i[1][0] = choice(list_of_relevant_transformations)
         del transformations[t][i[1][0]] #trim
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
     elif t == 'vegetarian':
 
+        if type_of_food != 'proteins':
+            return i
+
+
         if i[1][3][t] == 1:
             return i
 
-        print('hiya')
         og_name = i[1][0]
-        print(og_name)
-        i[1][0] = list(list_of_relevant_transformations.keys())[0]
-        print(i[1][0])
+        i[1][0] = choice(list(list_of_relevant_transformations.keys()))
         del transformations[t][i[1][0]] #trim
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
-        print(i[0])
 
     return i
 
