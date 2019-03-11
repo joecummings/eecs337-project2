@@ -61,6 +61,10 @@ def transform_generic(transformation,r):
                 new_recipe.add_ingredient(new_ingredient)
                 for i,s in enumerate(new_steps):
                     new_steps[i] = s.replace(ingredient[1][0], new_ingredient[1][0])
+    
+    for t in r.get_tools():
+        new_recipe.add_tool(t)
+    
     for s in new_steps:
         new_recipe.add_step(s)
     return new_recipe
