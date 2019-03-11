@@ -8,6 +8,7 @@ import pickle
 ingredients = set([])
 tokenizer = MWETokenizer()
 utensil_tokenizer = MWETokenizer()
+method_tokenizer = MWETokenizer()
 measurements = set([])
 techniques = set([])
 
@@ -35,15 +36,17 @@ def pull_veggies():
     veggies = wiki.pull_all_vegetables()
     return veggies
 def pull_utensils():
-    utensils = wiki.pull_wikidata_utensils();
+    utensils = wiki.pull_wikidata_utensils()
     return utensils
 def pull_wiki():
     res = wiki.pull_wikidata_food()
     return res
 utensils = pull_utensils()
 utensils.add('bowl')
+utensils.add('dish')
 meats = pull_meat()
 veggies = pull_veggies()
+methods = wiki.pull_wikidata_cooking_techniques()
 
 def build_tokenizer():
     for i in food:
@@ -52,6 +55,9 @@ def build_tokenizer():
     for u in utensils:
         i = u.lower().split("_")
         utensil_tokenizer.add_mwe(i)
+    for m in methods:
+        i = m.lower().split("_")
+        method_tokenizer.add_mwe(i)
 
 def load_ingredients():
     print("Loading...")
@@ -158,12 +164,15 @@ class Ingredient:
 
 def organize_directions(s):
     referenced_utensils = set([])
+    referenced_methods = set([])
     sent_list = sent_tokenize(s)
-    print("")
     for s in sent_list:
         used = extract_utensils(s)
+        methods_used = extract_methods(s)
+        referenced_methods = referenced_methods.union(methods_used)
         referenced_utensils = referenced_utensils.union(used)
-    return sent_list, referenced_utensils
+
+    return sent_list, referenced_utensils, referenced_methods
 
 def extract_utensils(sentence):
     used = set([])
@@ -172,6 +181,13 @@ def extract_utensils(sentence):
         if token in utensils and token not in measurements:
             used.add(token)
     return used
+def extract_methods(sentence):
+    used_methods = set([])
+    tokens = method_tokenizer.tokenize(sentence.replace(",", "").split()) 
+    for token in tokens:
+        if token in methods:
+            used_methods.add(token)
+    return used_methods
 def build_ingredient(s,index):
     #tags
     tags = {}

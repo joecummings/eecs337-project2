@@ -44,9 +44,12 @@ def print_recipe(r):
     print("\nINGREDIENTS\n")
     for i,gred in enumerate(r.ingredients):
         print("\t"+ "- " + str(gred[0]))
-    print("\nKITCHEN UTENSILS\n")
+    print("\nKITCHEN UTENSILS")
     for tool in r.get_tools():
         print("\t"+ "- ",tool)
+    print("\nCOOKING TECHNIQUES")
+    for m in r.get_methods():
+        print("\t"+"- ", m)
     print("\nDIRECTIONS\n")
     for i, step in enumerate(r.steps):
         print("\t" + str(i + 1) + ") " + str(step))
@@ -122,15 +125,19 @@ def scrape_recipe(soup):
     try:
         directions = soup.find_all("span", {"class": "recipe-directions__list--item"})
         utensils = set([])
+        methods = set([])
         for i in directions:
             step = cleanhtml(str(i))
             if step.strip() != "":
-                sentences, uten = r.organize_directions(step)
+                sentences, uten, meth = r.organize_directions(step)
                 utensils = utensils.union(uten)
+                methods = methods.union(meth)
                 for sentence in sentences:
                     recipe.add_step(sentence)
         for u in utensils:
             recipe.add_tool(u.replace("_"," "))
+        for m in methods:
+            recipe.add_method(m.replace("_", " "))
     except:
         directions = "NA"
 
