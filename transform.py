@@ -29,6 +29,8 @@ for k,v in foodtypes.items():
             transformations['vegetarian'][k] = 1
 
 
+
+
 def transform_generic(transformation,r):
     '''
     Parameters:
@@ -156,6 +158,10 @@ def swap_ingredient(i, t):
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
     elif t == 'healthy':
+
+        if type_of_food != 'proteins' or type_of_food != 'oil':
+            return i
+
         if i[1][3][t] == 1:
             return i
         
@@ -172,6 +178,10 @@ def swap_ingredient(i, t):
         i[0] = i[1][1]+' '+i[1][2]+' '+i[1][0]
 
     elif t == 'vegetarian':
+
+        if type_of_food != 'proteins':
+            return i
+
 
         if i[1][3][t] == 1:
             return i
