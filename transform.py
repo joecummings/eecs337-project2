@@ -28,9 +28,6 @@ for k,v in foodtypes.items():
         if local_bool:
             transformations['vegetarian'][k] = 1
 
-
-
-
 def transform_generic(transformation,r):
     '''
     Parameters:

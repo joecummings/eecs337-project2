@@ -2,7 +2,6 @@ from nltk import MWETokenizer, sent_tokenize
 import json
 import re
 import string
-import scraper as s
 import wiki
 import pickle
 ingredients = set([])
