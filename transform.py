@@ -48,7 +48,10 @@ def transform_generic(transformation,r):
                 new_ingredient = swap_ingredient(ingredient, transformation)
                 new_recipe.add_ingredient(new_ingredient)
                 for i,s in enumerate(new_steps):
-                    new_steps[i] = s.replace(ingredient[1][0], new_ingredient[1][0])
+                    for j,ingred in enumerate(new_steps[i].ingredients):
+                        if ingred == ingredient[1][0]:
+                            new_steps[i].ingredients[j] = new_ingredient[1][0]
+                    new_steps[i].sentence = new_steps[i].sentence.replace(ingredient[1][0], new_ingredient[1][0])
         #normal
         else:
             if ingredient[1][3][transformation] == 1:
@@ -57,13 +60,17 @@ def transform_generic(transformation,r):
                 new_ingredient = swap_ingredient(ingredient, transformation)
                 new_recipe.add_ingredient(new_ingredient)
                 for i,s in enumerate(new_steps):
-                    new_steps[i] = s.replace(ingredient[1][0], new_ingredient[1][0])
+                    for j,ingred in enumerate(new_steps[i].ingredients):
+                        if ingred == ingredient[1][0]:
+                            new_steps[i].ingredients[j] = new_ingredient[1][0]
+                    new_steps[i].sentence = new_steps[i].sentence.replace(ingredient[1][0], new_ingredient[1][0])
     
     for t in r.get_tools():
         new_recipe.add_tool(t)
     
     for s in new_steps:
-        new_recipe.add_step(s)
+        new_recipe.add_step(s.sentence,s.tools,s.methods,s.ingredients,s.time)
+    
     return new_recipe
 
 def transform_to_vegetarian(r):

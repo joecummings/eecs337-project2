@@ -111,6 +111,7 @@ class Step:
         self.methods = methods
         self.time = time
         self.ingredients = ingredients
+
 class Recipe:
     def __init__(self, name):
         self.name = name
@@ -157,7 +158,10 @@ class Recipe:
                 maxKey = key
         return maxKey
     def add_step(self, step, utensils, method, ing, time):
+        # if utensils:
         self.steps.append(Step(step,ing, utensils,method, time))
+        # else:
+        #     self.steps.append(step)
         return
 
     def set_rating(self, rating):
