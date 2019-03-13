@@ -1,4 +1,4 @@
-from nltk import MWETokenizer, sent_tokenize
+from nltk import MWETokenizer, sent_tokenize, PorterStemmer
 import json
 import re
 import string
@@ -10,7 +10,7 @@ utensil_tokenizer = MWETokenizer()
 method_tokenizer = MWETokenizer()
 measurements = set([])
 techniques = set([])
-
+ps = PorterStemmer()
 
 mexican = {}
 chinese = {}
@@ -46,7 +46,7 @@ utensils.add('dish')
 meats = pull_meat()
 veggies = pull_veggies()
 methods = wiki.pull_wikidata_cooking_techniques()
-
+methods.add("broil")
 def build_tokenizer():
     for i in food:
         s = i.split("_")
@@ -184,7 +184,8 @@ def extract_methods(sentence):
     used_methods = set([])
     tokens = method_tokenizer.tokenize(sentence.replace(",", "").split()) 
     for token in tokens:
-        if token in methods:
+        print(ps.stem(token.lower()))
+        if ps.stem(token.lower()) in methods:
             used_methods.add(token)
     return used_methods
 def build_ingredient(s,index):
