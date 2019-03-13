@@ -25,6 +25,7 @@ def main():
         if next_action == "":
             print_recipe(recipe)
         print("*** *** ***\n")
+        print("Show Parsed Recipe Again-> p")
         print("Mexican -> m")
         print("Chinese -> c")
         print("Vegetarian -> v")
@@ -34,8 +35,11 @@ def main():
         print("Exit -> x")
         next_action = input("Select your next action/transformation: ")
         print("--- --- --- --- --- --- --- ---\n")
-        new_recipe = perform_transform(next_action,recipe)
-        print_recipe(new_recipe)
+        if next_action == "p":
+            next_action = ""
+        else:
+            new_recipe = perform_transform(next_action,recipe)
+            print_recipe(new_recipe)
         
 def print_recipe(r):
     print("\n*** *** ***")
@@ -43,16 +47,36 @@ def print_recipe(r):
     # print("Calorie Count: {0}".format(r.calories))
     print("\nINGREDIENTS\n")
     for i,gred in enumerate(r.ingredients):
-        print("\t"+ "- " + str(gred[0]))
-    print("\nKITCHEN UTENSILS")
+        print("Ingredient {0}".format(i))
+        print("\tName: ", gred[1][0])
+        if gred[1][2] != "":
+            print("\tMeasurement: ", gred[1][2])
+        if gred[1][1] != "":
+            print("\tQuantity: ", gred[1][1], "\n")
+            
+    print("\nKITCHEN TOOLS")
     for tool in r.get_tools():
         print("\t"+ "- ",tool)
     print("\nCOOKING TECHNIQUES")
-    for m in r.get_methods():
-        print("\t"+"- ", m)
+    print("\tPrimary: {0}".format(r.get_primary_method()))
+    print("\tAll Techniques: {0}".format(list(r.get_methods())))
+    # for m in r.get_methods():
+    #     print("\t"+"- ", m)
     print("\nDIRECTIONS\n")
     for i, step in enumerate(r.steps):
-        print("\t" + str(i + 1) + ") " + str(step))
+        print("Step " + str(i + 1) + ") " + str(step.sentence))
+        if len(step.ingredients) != 0:
+            print("\tIngredients: " + str(step.ingredients))
+        if len(step.tools) != 0:
+            print("\tTools: "  + str(step.tools))
+        if len(step.methods) != 0:
+            print("\tMethods: "  + str(step.methods))
+        if step.time != "N/A":
+            print("\tTime: "  + str(step.time))
+        print("")
+
+
+
 
 
 def perform_transform(n,recipe):
@@ -118,7 +142,7 @@ def scrape_recipe(soup):
     ingredients = soup.find_all("span", {"itemprop": "recipeIngredient"})
     count = 1
     for i in ingredients:
-        parsed_i = r.build_ingredient(cleanhtml(str(i)),count)
+        parsed_i = r.build_ingredient(cleanhtml(str(i)))
         recipe.add_ingredient([cleanhtml(str(i)), parsed_i])
         count+=1
 
@@ -128,16 +152,19 @@ def scrape_recipe(soup):
         methods = set([])
         for i in directions:
             step = cleanhtml(str(i))
-            if step.strip() != "":
-                sentences, uten, meth = r.organize_directions(step)
-                utensils = utensils.union(uten)
-                methods = methods.union(meth)
+            if step.strip() != "" and "Watch Now" not in step:
+                sentences = r.tokenize_step(step)
                 for sentence in sentences:
-                    recipe.add_step(sentence)
+                    uten, meth, ing, time = r.organize_directions(sentence)
+                    for m in meth:
+                        recipe.add_method(m.replace("_", " "))
+                    utensils = utensils.union(uten)
+                    # methods = methods.union(meth)
+                    recipe.add_step(sentence, uten, meth, ing, time)
         for u in utensils:
             recipe.add_tool(u.replace("_"," "))
-        for m in methods:
-            recipe.add_method(m.replace("_", " "))
+        # for m in methods:
+        #     recipe.add_method(m.replace("_", " "))
     except:
         directions = "NA"
 
