@@ -1,4 +1,4 @@
-from nltk import MWETokenizer, sent_tokenize
+from nltk import MWETokenizer, sent_tokenize, PorterStemmer
 import json
 import re
 import string
@@ -10,11 +10,13 @@ utensil_tokenizer = MWETokenizer()
 method_tokenizer = MWETokenizer()
 measurements = set([])
 techniques = set([])
-
+ps = PorterStemmer()
 
 mexican = {}
 chinese = {}
 food = set([])
+unnaccounted_methods = ["broil","mix","grease", "coat", "arrange", "sprinkle"]
+unnaccounted_tools = ["bowl","dish", "broiler"]
 with open('healthy.pickle', 'rb') as handle:
         healthy = pickle.load(handle)
 
@@ -41,11 +43,14 @@ def pull_wiki():
     res = wiki.pull_wikidata_food()
     return res
 utensils = pull_utensils()
-utensils.add('bowl')
-utensils.add('dish')
+for tool in unnaccounted_tools:
+    utensils.add(tool)
 meats = pull_meat()
 veggies = pull_veggies()
 methods = wiki.pull_wikidata_cooking_techniques()
+for method in unnaccounted_methods:
+    methods.add(ps.stem(method))
+
 
 def build_tokenizer():
     for i in food:
@@ -63,7 +68,7 @@ def load_ingredients():
     wiki_ingredients = pull_wiki()
     for i in wiki_ingredients['ingredients']:
         food.add(i.replace(" ", "_"))
-
+    food.add("parsley")
     with open("ingredients.json") as file:
         data = json.load(file)
         for i in data:
@@ -99,7 +104,13 @@ def load_corpus():
             measurements.add(i)
         for j in data['techniques']:
             techniques.add(j)
-
+class Step:
+    def __init__(self, sentence,ingredients, tools, methods, time):
+        self.sentence = sentence
+        self.tools = tools
+        self.methods = methods
+        self.time = time
+        self.ingredients = ingredients
 class Recipe:
     def __init__(self, name):
         self.name = name
@@ -108,7 +119,7 @@ class Recipe:
         self.calories = 0
         self.ingredients = []
         self.tools = []
-        self.methods = []
+        self.methods = dict()
         self.steps = []
 
     def get_ingredients(self):
@@ -118,7 +129,7 @@ class Recipe:
         return self.tools
 
     def get_methods(self):
-        return self.methods
+        return self.methods.keys()
 
     def get_steps(self):
         return self.steps
@@ -132,11 +143,21 @@ class Recipe:
         return
 
     def add_method(self, method):
-        self.methods.append(method)
+        if method not in self.methods.keys():
+            self.methods[method] = 1
+        else:
+            self.methods[method] += 1
         return
-
-    def add_step(self, step):
-        self.steps.append(step)
+    def get_primary_method(self):
+        max = 0
+        maxKey = ""
+        for key in self.methods.keys():
+            if self.methods.get(key) > max:
+                max = self.methods.get(key)
+                maxKey = key
+        return maxKey
+    def add_step(self, step, utensils, method, ing, time):
+        self.steps.append(Step(step,ing, utensils,method, time))
         return
 
     def set_rating(self, rating):
@@ -160,34 +181,46 @@ class Ingredient:
         self.conversion = "N/A"
         self.descriptor = descriptor
         self.preparation = preparation
-
+def tokenize_step(step):
+    return sent_tokenize(step)
 def organize_directions(s):
-    referenced_utensils = set([])
-    referenced_methods = set([])
-    sent_list = sent_tokenize(s)
-    for s in sent_list:
-        used = extract_utensils(s)
-        methods_used = extract_methods(s)
-        referenced_methods = referenced_methods.union(methods_used)
-        referenced_utensils = referenced_utensils.union(used)
-
-    return sent_list, referenced_utensils, referenced_methods
-
+    ingredients = grab_ingredients(s)
+    used = extract_utensils(s)
+    methods_used = extract_methods(s)
+    time = extract_time(s)
+    return used, methods_used, ingredients, time
+def hasNumbers(inputString):
+    return any(char.isdigit() for char in inputString)
+def extract_time(s):
+    if not hasNumbers(s):
+        return "N/A"
+    else:
+        tokens = tokenizer.tokenize(s.replace(",","").replace(".","").split())
+        for i,token in enumerate(tokens):
+            if hasNumbers(token):
+                return token +" " +  tokens[i+1]
+        return "N/A"
+    
+def grab_ingredients(s):
+    phrase = s.replace(",", "").replace(".","").lower()
+    words = tokenizer.tokenize(phrase.split())
+    i = tag_ingredients(words)
+    return i
 def extract_utensils(sentence):
     used = set([])
-    tokens = utensil_tokenizer.tokenize(sentence.replace(",","").split())
+    tokens = utensil_tokenizer.tokenize(sentence.replace(",","").replace(".","").split())
     for token in tokens:
         if token in utensils and token not in measurements:
             used.add(token)
     return used
 def extract_methods(sentence):
     used_methods = set([])
-    tokens = method_tokenizer.tokenize(sentence.replace(",", "").split()) 
+    tokens = method_tokenizer.tokenize(sentence.replace(",", "").replace(".","").split()) 
     for token in tokens:
-        if token in methods:
-            used_methods.add(token)
+        if ps.stem(token.lower()) in methods:
+            used_methods.add(ps.stem(token.lower()))
     return used_methods
-def build_ingredient(s,index):
+def build_ingredient(s):
     #tags
     tags = {}
     tags['healthy'] = 1
@@ -259,6 +292,12 @@ def tag_ingredient_name(words):
             name = word
     return name
 
+def tag_ingredients(words):
+    names = []
+    for word in words:
+        if word in food and ps.stem(word) not in methods and word not in utensils:
+            names.append(word.replace("_"," "))
+    return names
 
 def tag_ingredient_quantity(words, ingredient):
     qty = []
